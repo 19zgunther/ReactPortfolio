@@ -1099,6 +1099,111 @@ function distToClosestPointOnRayToRay(constraintRayDirection, constraintRayStart
 
 
 
+function removeDuplicateVertices(verts, inds, norms, cols)
+{
+    let vertDict = {};
+    let vertices = [];
+    let indices = [];
+    let normals = [];
+    let colors = [];
+    for(let i=0; i<inds.length; i++)
+    {
+        var hash = verts[inds[i]*3] + verts[inds[i]*3+1]*1000 + verts[inds[i]*3+2]*1000000;
+        var ret = vertDict[hash];
+        if (ret != null)
+        {
+            //If we've already encountered this vertex...
+            // just change inds
+            indices.push(ret);
+        } else {
+            var newInd = vertices.length/3;
+            indices.push(newInd);
+            vertices.push(  verts[inds[i]*3], verts[inds[i]*3+1], verts[inds[i]*3+2] );
+            // if (normals.length > inds[i]*3) { 
+            normals.push(   norms[inds[i]*3], norms[inds[i]*3+1], norms[inds[i]*3+2] );
+            // }
+            // if (colors.length > inds[i]*4)
+            // {
+            colors.push( cols[inds[i]*4], cols[inds[i]*4+1], cols[inds[i]*4+2], cols[inds[i]*4+3] );
+            // }
+            
+            vertDict[hash] = newInd;
+        }
+    }
+    return {
+        vertices: vertices,
+        indices: indices,
+        colors: colors,
+        normals: normals,
+    };
+}
+
+
+
+function generateSphereMesh(steps = 1, radius = 1, randomModifier = 0.0)
+{
+    let vertices = [0,-1,0, 1,0,0, 0,0,1, -1,0,0, 0,0,-1, 0,1,0];
+    for (let i in vertices)
+    {
+        vertices[i] = vertices[i]*radius;
+    }
+    let indices = [0,1,2, 0,2,3, 0,3,4, 0,4,1, 1,5,2, 2,5,3, 3,5,4, 4,5,1];
+    let zz = new vec4();
+    for (let s=0; s<steps; s++)
+    {
+        let inds = [];
+        let verts = [];
+
+        for( let i=0; i<indices.length; i+=3)
+        {
+            let v1 = new vec4(vertices[indices[i]*3], vertices[indices[i]*3 + 1], vertices[indices[i]*3 + 2]);
+            let v2 = new vec4(vertices[indices[i+1]*3], vertices[indices[i+1]*3 + 1], vertices[indices[i+1]*3 + 2]);
+            let v3 = new vec4(vertices[indices[i+2]*3], vertices[indices[i+2]*3 + 1], vertices[indices[i+2]*3 + 2]);
+
+            let b1 = (v1.add(v2)).muli(0.5);
+            b1.muli( radius/distanceBetweenPoints(b1, zz)  );
+            let b2 = (v2.add(v3)).muli(0.5);
+            b2.muli( radius/distanceBetweenPoints(b2, zz)  );
+            let b3 = (v1.add(v3)).muli(0.5);
+            b3.muli( radius/distanceBetweenPoints(b3, zz)  );
+
+            let lv = verts.length/3;
+
+            inds.push( lv, lv+3, lv+5 );  //bottom-left
+            inds.push( lv+3, lv+1, lv+4); //top
+            inds.push( lv+5, lv+4, lv+2); //bottom-right
+            inds.push( lv+3, lv+4, lv+5); //center
+
+            verts.push(v1.x, v1.y, v1.z,   v2.x, v2.y, v2.z,  v3.x, v3.y, v3.z);
+            verts.push(b1.x, b1.y, b1.z,   b2.x, b2.y, b2.z,  b3.x, b3.y, b3.z);
+        }
+
+        //var ret = removeDuplicateVertices(verts, inds);
+        //vertices = ret.vertices;
+        //indices = ret.indices;
+        vertices = verts;
+        indices = inds;
+    }
+
+    let normals = [];
+    let colors = [];
+
+    for (let i=0; i<vertices.length; i+=3)
+    {
+        // Compute normal
+        let v1 = new vec4(vertices[i], vertices[i+1], vertices[i+2]).scaleToUnit();
+        normals.push(v1.x, v1.y, v1.z);
+        colors.push(1,1,1);
+    }
+
+    let ret = removeDuplicateVertices(vertices, indices, normals, colors);
+
+    for (let i=0; i<ret.vertices.length; i++)
+    {
+        ret.vertices[i] += Math.random()*randomModifier*radius;
+    }
+    return ret;
+}
 
 
 
@@ -1132,4 +1237,18 @@ function closeTo(n1=1, n2=10, delta = 0.000001)
     return (Math.abs(n1-n2) < delta);
 }
 
-export { vec4, mat4, closeTo, distanceBetweenPoints, vectorFromPointToPlane, getRotationFromRotationMatrix, distanceFromPointToRay, closestPointOnRayToRay, distToClosestPointOnRayToRay, distToRayPlaneIntersection, pointLineSegmentIntersectsPlane };
+export { 
+    vec4, 
+    mat4, 
+    closeTo, 
+    distanceBetweenPoints, 
+    vectorFromPointToPlane, 
+    getRotationFromRotationMatrix, 
+    distanceFromPointToRay, 
+    closestPointOnRayToRay, 
+    distToClosestPointOnRayToRay, 
+    distToRayPlaneIntersection, 
+    pointLineSegmentIntersectsPlane, 
+    generateSphereMesh, 
+    removeDuplicateVertices 
+};

@@ -86,6 +86,7 @@ class EasyGL {
         this._initShader();
         this._initTextureShader();
         this._initPickerShader();
+        this._initSkyboxShader();
         this.clear();
     }
 
@@ -369,6 +370,68 @@ class EasyGL {
 
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
 
+    }
+    _initSkyboxShader()
+    {
+        const vsSource = `
+        attribute vec4 aVertexPosition;
+        attribute vec4 aColor;
+        uniform mat4 uProjectionMatrix;
+        uniform mat4 uViewMatrix;
+
+        varying highp vec4 pos;
+
+        void main() {
+            vec4 vPos = vec4(aVertexPosition.x, aVertexPosition.y, aVertexPosition.z, 1.0);
+            pos = vPos;
+            gl_Position = uProjectionMatrix * uViewMatrix * pos;
+        }`;
+    
+        const fsSource = `
+        precision mediump float;
+        varying vec4 pos;
+
+        void main() {
+            gl_FragColor = vec4(pos.xyz, 1.0);
+        }
+        `;
+        const vertexShader = this.__loadShader(this.gl.VERTEX_SHADER, vsSource);
+        const fragmentShader = this.__loadShader(this.gl.FRAGMENT_SHADER, fsSource);
+
+        // Create the shader program
+        const shaderProgram = this.gl.createProgram();
+        this.gl.attachShader(shaderProgram, vertexShader);
+        this.gl.attachShader(shaderProgram, fragmentShader);
+        this.gl.linkProgram(shaderProgram);
+
+        // If creating the shader program failed, alert
+        if (!this.gl.getProgramParameter(shaderProgram, this.gl.LINK_STATUS)) {
+            console.error('Unable to initialize the shader program: ' + this.gl.getProgramInfoLog(shaderProgram));
+            return null;
+        }
+
+        const programInfo = {
+            program: shaderProgram,
+            attribLocations: {
+                vertexLocation: this.gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
+                normalLocation: this.gl.getAttribLocation(shaderProgram, 'aNormalVector'),
+                textureCoordLocation: this.gl.getAttribLocation(shaderProgram, 'aTextureCoord'),
+            },
+            uniformLocations: {
+                projectionMatrix: this.gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
+                viewMatrix: this.gl.getUniformLocation(shaderProgram, 'uViewMatrix'),
+                objectMatrix: this.gl.getUniformLocation(shaderProgram, 'uObjectMatrix'),
+                objectRotationMatrix: this.gl.getUniformLocation(shaderProgram, 'uObjectRotationMatrix'),
+                lightDirectionVector: this.gl.getUniformLocation(shaderProgram, 'uLightDirectionVector'),
+                ambientLightLevelFloat: this.gl.getUniformLocation(shaderProgram, 'uAmbientLightLevel'),
+                cameraPositionVector: this.gl.getUniformLocation(shaderProgram, 'uCameraPositionVector'),
+                objectReflectivity: this.gl.getUniformLocation(shaderProgram, 'uObjectReflectivity'),
+                textureSampler: this.gl.getUniformLocation(shaderProgram, 'uTextureSampler'),
+            },
+        };
+
+        this.skyboxShaderProgram = shaderProgram;
+        this.skyboxProgramInfo = programInfo;
     }
 
 

@@ -16,7 +16,7 @@
 *       Call update() to update position and rotation, generally every render frame.
 */
 
-import { vec4, mat4 } from "../myMath";
+import { vec4, mat4, getRotationFromRotationMatrix } from "../myMath";
 
 class FPC {
     constructor(position = new vec4(), rotation = new vec4())
