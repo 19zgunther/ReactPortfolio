@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zack Gunther</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../menu.css">
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.ico" />
+</head>
+
+<body id="Background">
+
+    <!-- Menu Goes Here -->
+
+    <div style = 'display: flex; width: 100%; justify-content: center;'>
+        <h1>
+            Snake Game Neural Network V2
+        </h1>
+    </div>
+    <div style = 'display: flex; width: 100%; justify-content: center;'>
+        <div style="display:block; width: fit-content; max-width: 80vw;">
+            This is my second attempt at making a perfect AI for playing snake game! 
+            This time, the snake learns in real time on your computer. 
+            <br><br>
+            The inputs to this model are the surrounding tiles, and the outputs are Up, Down, Left, and Right. 
+            The neural network rendering below shows the weights of the current model, with red and blue lines representing positive and negative weights respectively.
+            <br><br>
+            Each snake uses the same neural network, thus should all behave the same given the same situation.
+            A centralized machine learning model with multiple snakes is being used to collect more training data per time step.
+            As for the training data, as the snakes navigate the world, training data is generated based on if the snake makes a sub-optimal move.
+            For example, if the model decides to run the head of the snake into a wall, we record the inputs and find an output that if had been generated would have kept the snake alive.
+            To incentivize the snake eating apples, at each update the closest apple is found to the snake and the outputs which would move the snake closer are recorded.
+            For modifying the weights a simple gradient descent back-propagation algorithm was implemented. The activation function used is a linearized tanh function. 
+            Through these two means of learning and gradient descent, the snake is able to learn that 1.) Hitting walls is bad, and 2.) Apples are good
+            <br><br>
+            Feel free to mess around with the different parameters available, and see how the snake learns differently!
+        </div>
+    </div>
+
+    <style>
+        table {
+            border-collapse:collapse; 
+        }
+        tr {
+            border:1px solid white;
+            padding: 1vmin;
+        }
+        td {
+            padding:  0.5vmin;
+        }
+    </style>
+
+    <div style="padding-left: 10vw; padding-right: 10vw;">
+        <div style="display: flex; width: 100%; justify-content: center;">
+            <table>
+                <tr>
+                    <td>
+                        Update Speed:
+                    </td>
+                    <td>
+                        <input id="speedSlider" type="range" value="90" min="0" max="100" step="1" oninput="simulationSpeedSliderUpdate()">
+                    </td>
+                    <td>
+                        <div id="speedSliderText"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Num Snakes:
+                    </td>
+                    <td>
+                        <input id="numSnakesSlider" type="range" value="20" min="1" max="100" step="1" oninput="simulationSpeedSliderUpdate()">
+                    </td>
+                    <td>
+                        <div id="numSnakesSliderText"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Num Apples:
+                    </td>
+                    <td>
+                        <input id="numApplesSlider" type="range" value="20" min="1" max="100" step="1" oninput="simulationSpeedSliderUpdate()">
+                    </td>
+                    <td>
+                        <div id="numApplesSliderText"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Grid Width:
+                    </td>
+                    <td>
+                        <input id="gridWidthSlider" type="range" value="32" min="1" max="100" step="1" oninput="simulationSpeedSliderUpdate()">
+                    </td>
+                    <td>
+                        <div id="gridWidthSliderText"></div>
+                    </td>
+                </tr>
+            </table>
+            
+            <div style="display: block; width: 1vw;">
+    
+            </div>
+    
+            <table>
+                <tr>
+                    <td>
+                        Weight Modifier:
+                    </td>
+                    <td>
+                        <input id="weightSlider" type="range" min="1" max="100" step="1" oninput="simulationSpeedSliderUpdate()">
+                    </td>
+                    <td>
+                        <div id="weightSliderText"></div>
+                    </td>
+                </tr>
+    
+                <tr>
+                    <td>
+                        G.D. Iters Per Update:
+                    </td>
+                    <td>
+                        <input id="gradDescentIterSlider" type="range" value="50" min="1" max="100" step="1" oninput="simulationSpeedSliderUpdate()">
+                    </td>
+                    <td>
+                        <div id="gradDescentIterSliderText"></div>
+                    </td>
+                </tr>
+    
+                <tr>
+                    <td>
+                        Random Prune Percentage:
+                    </td>
+                    <td>
+                        <input id="randomPruneSlider" type="range" value="10" min="1" max="100" step="1" oninput="simulationSpeedSliderUpdate()">
+                    </td>
+                    <td>
+                        <div id="randomPruneSliderText"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="display: flex; width: 100%; justify-content: center;">
+            <div style='width:fit-content; height:fit-content; background-color: white; color:black; cursor: pointer; padding: 1vmin; margin: 1vmin;' onclick='setup()'>
+                Reset
+            </div>
+            <div style='width:fit-content; height:fit-content; background-color: white; color:black; cursor: pointer; padding: 1vmin; margin: 1vmin;' onclick='randomlyPruneWeights()'>
+                Randomly Prune Weights
+            </div>
+            <div style='width:fit-content; height:fit-content; background-color: white; color:black; cursor: pointer; padding: 1vmin; margin: 1vmin;' onclick='resetTrainingData()'>
+                Rest Training Data
+            </div>
+            <div style='width:fit-content; height:fit-content; background-color: white; color:black; cursor: pointer; padding: 1vmin; margin: 1vmin;' onclick='saveNNWeights()'>
+                Save NN Weights
+            </div>
+            <div style='width:fit-content; height:fit-content; background-color: white; color:black; cursor: pointer; padding: 1vmin; margin: 1vmin;' onclick='loadNNWeights()'>
+                Load NN Weights
+            </div>
+            <input id="fileInput" type="file" style="position: fixed; top: -100%">
+        </div>
+    </div>
+
+    <div style = 'display: flex; width: 100%; justify-content: center; flex-wrap:wrap;'>
+        <canvas id='snakeCanvas'              style='height: 45vw; aspect-ratio: 1/1; padding: 2vmin;'></canvas>
+        <canvas id='snakeNeuralNetworkCanvas' style='height: 45vw; aspect-ratio: 1/1; padding: 2vmin;'></canvas>
+    </div>
+<!--     
+    <div style = 'display: flex; width: 100%; justify-content: center; padding-bottom: 5vmin; '>
+        <div style='width:fit-content; height:fit-content; background-color: white; color:black; cursor: pointer; padding: 1vmin;' onclick='reset()'>
+            Reset
+        </div>
+    </div> -->
+
+
+<!--     <div style = 'display: flex; width: 100%; justify-content: center;'>
+        <div style='width: 90vmin; margin-bottom: 5vmin;'>
+            I have always been fascinated by brains, how they think and how they learn. Thus, I have always thought a machine learning project would be fun to work on!
+            For this project I decided to go with a neural network design, and instead of using a library like tensor flow, I decided to code the entire network and training algorithms myself.
+            As can be seen above on the left, I built a very basic snake game. 
+            <br><br>To simplify the problem for the neural network, I decided to give it only eight inputs. The first four describe the direction
+            from the head of the snake to the apple.
+            The second four inputs describe the four squares adjacent to the head of the snake. If the square is out of bounds or the snake is on the square, the input is 1. If the square is blank the input is 0.
+            As for the outputs, I decided four nodes would correspond to the cardinal directions, and the snake would take whichever direction's node had the greatest value.
+            <br><br>
+            After defining the inputs, I trained a neural network model using a generational method to adjust the network's weights.
+            This worked by generating 1000 machine models and randomly varying their weights. The best machine
+            would then become the parent for the next round of training, with the next 1000 machines generated with similar weight values.
+            <br><br>
+            As I mentioned above, in each round of training I would select the best machine and use it as the parent network in the following round. To do this, I had to develop a method of ranking or grading
+            each model. Originally, I gave each machine 10 points for each apple consumed and 1 point for each time step it stayed alive for. After about two seconds of training and about 100 generations, the 
+            training process began to slow down dramatically, until each training round took about a second to complete. Upon watching the best machine run, I realized the machine was simply going back and fourth or in a circle indefinitely.
+            This made me realize I needed to make staying alive a punishment rather than a reward, thus only snakes which consumed apples rapidly would have a positive score.
+            After adjusting the grading to have a -1 punishment for each time step, the network began to learn and to do what I wanted it to do.
+            The machine model that is running right now trained for about a minute and went through 1000 generations.
+            <br><br>
+            As you have probably noticed by now, this machine has a tendency to die after eating about twelve apples. I trained another model with the same inputs for about an hour, and didn't see any improvement whatsoever.
+            I also experimented with changing the number of hidden columns and nodes within each hidden column, with almost no improvement.
+            Because of this, I believe the current snake machine is almost as good as it can be given its simplicity and the limited input data. 
+            In the future, I would like to give a new machine the entire board as an input and to train it until it can beat the game, but for now it's probably best that I study for finals instead.
+        </div>
+    </div> -->
+    
+    <!--    
+    <div style = 'height: 100vh; display: block;'>
+        pad.
+    </div>
+
+    <canvas id='carCanvas' style = 'height:70vh; width: 90vw;'></canvas> -->
+</body>
+
+<script src="../../script.js"></script>
+<script src="../../point.js"></script>
+<script src="../../painter.js"></script>
+<script src="../CAD/myMath.js"></script>
+<script src="snake2.js"></script>
+</html>

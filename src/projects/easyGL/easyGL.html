@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zack Gunther</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../menu.css">
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.ico" />
+</head>
+
+<body id="Background">
+
+    <!-- Menu Goes Here -->
+    <!-- <style>
+        h1 {
+            font-size:xx-large;
+            width: 99vw;
+            text-align: center;
+        }
+        h2 {
+            font-size:large;
+            font-weight: normal;
+            width: 99vw;
+            text-align: center;
+        }
+        .hide {
+            display: none;
+        }
+
+        .daCanvas:hover + .hide {
+            display: block;
+            color: red;
+        }
+    </style> -->
+
+
+    <!--<div>
+        In dev<br>Hover to run each demo<br>
+        TODO:<br>
+        - Add textures<br>
+        - Add object selection via clicking<br>
+    </div>-->
+
+    <div style = 'display: flex; width: 100%; justify-content: center;'>
+        <h1>
+            EasyGl
+        </h1>
+    </div>
+    <div style = 'display: flex; width: 100%; justify-content: center;'>
+        <h2>
+            A webgl-based library designed for rendering basic objects
+        </h2>
+    </div>
+    <div style = 'display: flex; width: 100%; justify-content: center;'>
+        <h2>
+            <a href="https://github.com/19zgunther/EasyGL">
+                See https://github.com/19zgunther/EasyGL for details
+            </a>
+        </h2>
+    </div>
+    
+    <div style="display: block; position: relative;">
+        <div class = 'flexDiv' style="max-width: 99vw; flex-wrap: wrap; display: flex; position: relative; justify-content: center;">
+            <p style="position: absolute; top: 0; left: 0; display: block; margin: 1vmin; z-index: 100;">
+                Hover over each panel to run
+            </p>
+            <canvas class = 'daCanvas' id='c1' style='width:24.9vw; height: 80vh;'></canvas>
+            <canvas class = 'daCanvas' id='c2' style='width:24.9vw; height: 80vh;'></canvas>
+            <canvas class = 'daCanvas' id='c3' style='width:24.9vw; height: 80vh;'></canvas>
+            <canvas class = 'daCanvas' id='c4' style='width:24.9vw; height: 80vh;'></canvas>
+            <canvas class = 'daCanvas' id='c11' style='width:24.9vw; height: 80vh;'></canvas>
+            <canvas class = 'daCanvas' id='c12' style='width:24.9vw; height: 80vh;'></canvas>
+        </div>
+        <div class = 'flexDiv' style="display: flex; position: relative; justify-content: center;">
+            <p style="position: absolute; top: 0; left: 0; display: block; margin: 1vmin;">
+                Use WASD to move.<br>Click & Drag or use arrow keys to rotate camera
+            </p>
+            <canvas id='c5' style='width:99.9vw; height: 80vh;'></canvas>
+            <p style="position: absolute; bottom: 0; left: 0; display: block; margin: 1vmin; user-select: none;">
+                Lines of code: ~80
+            </p>
+        </div>
+
+        <div class = 'flexDiv' style="display: flex; position: relative; justify-content: center; user-select: none;">
+            <p style="position: absolute; top: 0; left: 0; display: block; margin: 1vmin; user-select: none;">
+                This is a Minecraft clone!<br>Use WASD to move.<br>Click & Drag or use arrow keys to rotate camera<br>
+                Left click to destroy blocks, and right click to place them! <br>
+                Use keyboard keys 1 through 0 to select inventory slot <br>
+                Press "e" to toggle inventory<br>
+                Right click and hold to place a line of blocks<br>
+                Hint: place the bright red block named "tnt" (8)<br>
+                <br>
+                <input id="zNearInput" type='range' min=0 max=10 step=0.01 value="3" oninput=sliderInput()>zNear</input> <br>
+                <input id="zFarInput" type='range' min=0 max=100 step=0.01 value ="100" oninput=sliderInput()>zFar</input> <br>
+                <input id="fovInput" type='range' min=0 max=3.14 step=0.01 value = "0.33" oninput=sliderInput()>FOV</input> <br>
+            </p>
+            <p style="position: absolute; bottom: 0; left: 0; display: block; margin: 1vmin; user-select: none;">
+                Note: Terrain generation is infinite
+                <br>
+                Lines of code: ~2500
+            </p>
+            <canvas id='mainCanvas' style='width:99.9vw; height: 95vh; user-select: none;' oncontextmenu="return false;"></canvas>
+        </div>
+
+        <br>
+
+    </div>
+</body>
+
+<script src="../../script.js"></script>
+<script src="../CAD/myMath.js"></script>
+<script src="easyGL.js"></script>
+<script src="fpc.js"></script>
+<script src="../clone/clone.js"></script>
+<script src="main.js"></script>
+</html>

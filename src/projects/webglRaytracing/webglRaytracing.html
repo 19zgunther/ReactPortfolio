@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zack Gunther</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../menu.css">
+</head>
+
+<body id="Background">
+
+
+
+    
+    <!-- Menu Goes Here -->
+
+    <div style='display: flex; width: 100%; justify-content: center;'>
+        <h1>
+            WebGL Raytracing
+        </h1>
+    </div>
+
+
+    <!-- <div style="display: block;position: relative; width: 100%; height: 100%; margin-top: 2vh; margin-bottom: 2vh;">
+        <div style='position: relative; display: block; width:90vmin; height:auto; justify-self: center; margin:auto;'>
+            <div style='top: 0; opacity: 0.8; background-color: rgba(100,100,100,0.5); padding: 1%; font-size: x-small; width:fit-content; position:absolute; z-index: 200;'>
+                <input id='frameRate' type='range' min=1 max=30 value=25 step=1 onchange="frameRate(this)">Frame Rate</input>
+                <br>
+                <input id='lightDistanceDivisor' type='range' min=0 max=10 value=4 step=0.1>Light Distance Divisor</input>
+                <br>
+                <input id='planeReflectance' type='range' min=0.1 max=0.99 value=0.8 step=0.01>Plane Reflectance</input>
+                <br>
+                <input id='sphereReflectance' type='range' min=0.1 max=0.99 value=0.2 step=0.01>Sphere Reflectance</input>
+                <br>
+                <input id='sphereDeformationMultiplier' type='range' min=0 max=0.99 value=0.1 step=0.01>Sphere Deformation Multiplier</input>
+                <br>
+                <input id='sphereDeformationFrequency' type='range' min=1 max=200 value=5 step=0.1>Sphere Deformation Frequency</input>
+                <br>
+                <div style = 'font-style: italic;font-size: inherit;'>
+                    Use WASD to move camera origin <br>
+                    Drag mouse or use the arrow keys to rotate
+                </div>
+            </div>
+        </div>
+        <canvas id='glcanvas' style = 'position:relative; display: block; width:100%; height:100%; z-index: 100; '></canvas>
+    </div> -->
+
+    <div style='opacity: 0.8; background-color: rgba(100,100,100,0.5); padding: 1%; font-size: x-small; width:fit-content; position:absolute; z-index: 200;'>
+        <input id='frameRate' type='range' min=1 max=30 value=2 step=1 onchange="frameRate(this)">Frame Rate</input>
+        <br>
+        <input id='lightDistanceDivisor' type='range' min=0 max=10 value=4 step=0.1>Light Distance Divisor</input>
+        <br>
+        <input id='planeReflectance' type='range' min=0.1 max=0.99 value=0.8 step=0.01>Plane Reflectance</input>
+        <br>
+        <input id='sphereReflectance' type='range' min=0.1 max=0.99 value=0.2 step=0.01>Sphere Reflectance</input>
+        <br>
+        <input id='sphereDeformationMultiplier' type='range' min=0 max=0.99 value=0.1 step=0.01>Sphere Deformation Multiplier</input>
+        <br>
+        <input id='sphereDeformationFrequency' type='range' min=1 max=200 value=5 step=0.1>Sphere Deformation Frequency</input>
+        <br>
+        <div style = 'font-style: italic;font-size: inherit;'>
+            Use WASD to move camera origin 
+            <br>
+            Drag mouse or use the arrow keys to rotate
+            <br>
+            Press Enter to regenerate random scene
+        </div>
+    </div>
+    <canvas id='glcanvas' style = 'position:relative; display: block; width:100%; height:100%; z-index: 100; '></canvas>
+
+    <div style = 'display: flex; width: 100%; justify-content: center;'>
+        <div style='width: 80vw; margin-bottom: 5vmin;margin-top: 5vmin;'>
+            1. This is an experimental raytracing engine I built, where I procedurally generate the GPU fragment shader
+            code. This allows for different scenes to be created quite easily!
+            <br><br>
+            2. Running this program can requires significant GPU usage, so I advise reducing the frame rate (via the first slider) if you are experiencing gittering.
+            <br><br>
+            3. Currently, every surface is perfectly smooth meaning there exists only one output ray for each ray-object intersection.
+            <br><br>
+            4. This renderer can raytrace planes, spheres, and triangles.
+        </div>
+    </div>
+    
+    
+
+
+</body>
+
+<script src="../../script.js"></script>
+<script src="../CAD/myMath.js"></script>
+<script src="webglRaytracing.js"></script>
+</html>

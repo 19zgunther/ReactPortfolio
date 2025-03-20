@@ -1,0 +1,22 @@
+
+
+.defaultButton {
+    background-color: rgba(50,50,50,0.7);
+    width: 100%;
+    min-width: fit-content;
+    padding: 3px;
+    margin: 3px;
+    text-align: center;
+    
+    transition: background-color 0.3s;
+}
+.defaultButton:hover {
+    cursor: pointer;
+    background-color: rgba(60,60,60,0.9);
+}
+
+@media (max-aspect-ratio: 3/3) {
+    .defaultButton {
+        padding: 2vmax;
+    }
+}

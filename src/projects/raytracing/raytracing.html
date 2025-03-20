@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zack Gunther</title>
+    <link rel="stylesheet" href="../../menu.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.ico" />
+</head>
+
+<body id="Background">
+    
+
+    <!-- Menu Goes Here -->
+    
+    <div style='display: flex; width: 100%; justify-content: center;'>
+        <h1>
+            Brute Force Raytracing
+        </h1>
+    </div>
+
+    <canvas id='canvas' style = 'width:10%; height:10%; padding: 5%; float:right'></canvas>
+
+    <div style = 'padding: 5%;'>
+        <div style="font-size:2em;">
+            Controls:
+        </div>
+        <div style="display:table;font-size: smaller;">
+            <!--Row 1-->
+            <div style='display: table-row'>
+                <div style='display: table-cell'>
+                    Image Size: 
+                </div>
+                <div style='display: table-cell'>
+                    100px <input id = 'ImageSize' type='range' min='100' max='1000' step='10' onchange = 'sliderChanged(this)'> 1000px
+                </div>
+            </div>
+            <!--Row 2-->
+            <div style='display: table-row'>
+                <div style='display: table-cell'>
+                    Light source x position:
+                </div>
+                <div style='display: table-cell'>
+                    -10 <input id = 'LSx' type='range' min='-9' max='9' step='.1' onchange = 'sliderChanged(this)'> 10
+                </div>
+            </div>
+            <!-- Row 3-->
+            <div style='display: table-row'>
+                <div style='display: table-cell'>
+                    Light source y position:
+                </div>
+                <div style='display: table-cell'>
+                    -10 <input id = 'LSy' type='range' min='-9' max='9' step='.1' onchange = 'sliderChanged(this)'> 10
+                </div>
+            </div>
+            <!-- Row 4-->
+            <div style='display: table-row'>
+                <div style='display: table-cell'>
+                    Light source z position:
+                </div>
+                <div style='display: table-cell'>
+                    -10 <input id = 'LSz' type='range' min='-9' max='9' step='.1' onchange = 'sliderChanged(this)'> 10
+                </div>
+            </div>
+            <br>
+        </div>
+        <div style="font-size:2em;">
+            About:
+        </div>
+
+        One day while I was browsing through social media I found an image of reflective spheres and a few other basic objects. 
+        The caption stated the image was rendered using ray tracing, a rendering technique I had heard of but knew little about.
+        After a few hours of research, I began working on this project: A JS ray tracing program.
+        <br><br>
+        This renderer (currently) can render two basic objects: Spheres and planes. It works by projecting a ray for each pixel and seeing what the ray intersects with. If the ray intersects with
+        an object the object color is recorded, a ray from that intersection is shot to the point light source to determine the light level (based on distance and blocking objects), and finally a 
+        new ray is recursively shot from the intersection in the reflected direction. The reflected ray returns a color value from what it hit, and all of the colors and light levels are accumulated
+        to find the final pixel color to display on the screen.
+        <br><br>
+        My implemenation of this rendering technique has some shortcomings. To start, each pixel can be computed completely independently of each other, thus it would make sense
+        to create a parallelized program which computes each pixel at the same time (say by using the GPU). My implementation is purely single-threaded, thus it takes a significant
+        amount of time to render even basic scenes (each pixel can be computed quickly, but there are very many pixels in each image). 
+        In the future I plan to restart and use webgl to program the GPU to allow for parallelization, potentially even allowing for real-time rendering.
+        <br><br>
+        Secondly, only two types of objects are currently renderable (Spheres and Planes) and no other light sources besides point light sources have been implemented.
+        This means only hard shadows are renderable, and light source reflections are less than optimal. Currently the point light source appears to be a rather large sphere,
+        but only the very center is used for computing shadows whereas the rest is simply a white-colored object. In the future I would like to change this lightsource issue
+        and add more object types, but for now I am satisfied with the program.
+        <br><br>
+        Note: Please check out my WebGL Raytracing project for a GPU-accelerated version!
+        <br>
+
+    </div>
+    <br><br>
+
+</body>
+
+<script src="../../script.js"></script>
+<script src="raytracing.js"></script>
+
+</html>

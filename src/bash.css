@@ -1,0 +1,72 @@
+.bash-container {
+  margin-top: 1.5rem;
+  line-height: 1.6;
+  font-size: 1.1rem;
+  font-family: 'Courier New', Courier, monospace;
+  color: var(--text-secondary);
+  max-width: 500px;
+  max-height: 50vh;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) var(--bg-secondary);
+  width: 100%;
+}
+
+/* Add landscape orientation styles */
+@media (orientation: landscape) {
+  .bash-container {
+    max-width: 70vw;
+  }
+}
+
+.bash-content {
+  font-family: 'Courier New', Courier, monospace;
+  transition: all 0.3s ease-out;
+  text-align: left;
+  width: 100%;
+  margin: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow: visible;
+}
+
+/* Remove min/max width constraints */
+.bash-content > div {
+  width: 100%;
+  overflow-wrap: break-word;
+}
+
+/* Webkit scrollbar styling */
+.bash-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.bash-container::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.bash-container::-webkit-scrollbar-thumb {
+  background-color: var(--accent-color);
+  border-radius: 4px;
+  border: 2px solid var(--bg-secondary);
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .bash-container {
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .bash-content {
+    width: 100%;
+  }
+} 

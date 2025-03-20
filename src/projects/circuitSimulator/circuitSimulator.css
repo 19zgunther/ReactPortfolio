@@ -1,0 +1,246 @@
+*{
+    font-size:large;
+    /*border-radius: 5px;*/
+    margin:0px;
+}
+
+
+canvas {
+    margin:0;
+    padding:0;
+    /*height:0px;*/
+    /*left:0px;
+    top: 0px;
+    position:absolute;*/
+    position:static;
+    background-color: rgba(0, 0, 0, 0);
+    display:block;
+    z-index: -1000;
+}
+#simulator {
+    justify-self: center;
+    justify-content: center;
+    padding-left: 4%;
+    position:relative;
+    max-width:100%;
+    max-height:80%;
+    margin:10px;
+    /*background-color: rgba(0, 0, 0, 1);*/
+}
+
+
+
+
+.Box{
+    margin:5px;
+    position:relative;
+    display:block;
+    width:fit-content;
+    height:auto;
+    top:5%;
+    right:0%;
+    border-color:rgb(200, 200, 200);
+    border-style: solid;
+    border-width:3px;
+    border-radius:20px;
+    z-index: 10;
+    /*background-color:rgb(0,0,0,0.5);*/
+    opacity: 0.85;
+    user-select: none;
+}
+.Box:hover{
+    opacity: 1;
+}
+
+
+.InputSlider{
+    margin:10px;
+    padding:0%;
+    display:inline;
+    stroke:red;
+    opacity:0.7;
+    background: red;
+}
+.InputSlider:hover{
+    opacity:1;
+}
+
+
+.InputText{
+    margin: 0px 5px 0px 5px;
+    padding: auto;
+    position:relative;
+    width:80px;
+    height:auto;
+    color:rgb(200, 200, 200);
+    background-color: rgba(0,0,0,0.5);
+    border-color:rgba(255, 255, 255, 1);
+    border-style:solid;
+    border-width:2px;
+    border-radius:5px;
+    text-align:right;
+    opacity: 0.8;
+}
+.InputText:hover{
+    opacity: 1;
+}
+
+
+.InputCheck{
+    background-color: rgb(255,255,255);
+    color: rgb(200,200,200);
+    padding-left:10px;
+    opacity: 0.8;
+}
+.InputCheck:hover{
+    opacity:1;
+}
+
+
+.Text{
+    padding: 1px 5px 1px 5px;
+    color:rgb(200, 200, 200);
+    z-index: 100000;
+    position: relative;
+}
+.TextHeading{
+    padding: 1px 5px 1px 5px;
+    color:rgb(200, 200, 200);
+    z-index: 100000;
+    position: relative;
+    font-size:x-large;
+    font-weight:bolder;
+    size:10px;
+}
+
+.Button{
+    position:relative;
+    /*padding: 10px 10px 10px 10px;*/
+    margin: 4px 4px 4px 4px;
+    text-align:center;
+    background-color:rgba(200,50,50);
+    border:rgb(200,200,200);
+    border-color:rgb(200,200,200);
+    border-radius: inherit;
+    border-width: inherit;
+    border-style: inherit;
+    opacity: 0.8;
+}
+.Button:hover{
+    cursor: pointer;
+    opacity: 1;
+}
+
+
+
+
+.SensorText{
+    position:absolute;
+    margin:5px;
+    padding: 5px;
+    background-color: rgba(0,0,0,0.99);
+    text-align:center;
+    border:rgba(200,200,200,0.5);
+    border-color:rgba(200,200,200,0.5);
+    border-radius:5px;
+    border-width:1px;
+    border-style: solid;
+    opacity:0.7;
+    user-select: none;
+    font-size: x-small;
+    line-height: 0.9;
+
+}
+
+
+
+
+
+.ui_button{
+    position:relative;
+    display:flex;
+    margin:5px;
+    padding:5px;
+    height: fit-content;
+    width: fit-content;
+    background-color:grey;
+} 
+.ui_button:hover{
+    background-color: rgb(186, 186, 186);
+    cursor:pointer;
+}
+
+
+
+
+
+
+
+
+
+.slider {
+    -webkit-appearance: none;
+    background: #656565;
+    outline: none;
+    opacity: 0.7;
+    height: 10px;
+    width: 200px;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    border-radius:25px;
+    padding:5px;
+  }
+  
+  .slider:hover {
+    opacity: 1;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width:30px;
+    height: 20px;
+    border-radius:10px;
+    background: #ffffff;
+    cursor: pointer;
+    padding:5px;
+  }
+  
+  .slider::-moz-range-thumb {
+    width:30px;
+    height: 20px;
+    border-radius:10px;
+    background: #ffffff;
+    cursor: pointer;
+    padding:5px;
+  }
+
+
+
+
+.gridText {
+    display:flex;
+    justify-content: flex-end;
+    align-items:center;
+    height:30px;
+    padding-right: 10px;
+    margin: auto;
+}
+
+.gridInput {
+    background-color: #303030;
+    height: 30px;
+    padding: 0px;
+    margin: 0px;
+    display:flex;
+    width: 80px;
+    opacity:0.7;
+    border-color:grey;
+    text-align: right;
+    border-style: solid;
+}
+.gridInput:hover{
+    opacity: 1;
+}
+
+

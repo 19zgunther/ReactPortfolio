@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gunther</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../circuitSimulator/circuitSimulator.css">
+    <link rel="stylesheet" href="../../menu.css">
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.ico" />
+</head>
+<body id = "Background">
+        <!-- Menu Goes Here -->
+        <h1>
+            Circuit Simulator
+        </h1>
+        <div style = "display:flex;">
+            <div style="margin-left:20px;margin-top:20px; width:fit-content; background-color: rgb(64, 64, 64);">
+                <div style = "margin:10px;">
+                    Select Example Circuit:
+                    <select id = "exampleCircuitDropDown" onchange = ChangeExampleCircuit() style = "width: 300px; background-color: rgb(100,100,100);">
+                        <option id = 'default'>default</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        
+        <div style = "display:flex; flex-wrap: wrap;">
+            <!-- General Settings -->
+            <div style="margin:20px; width:fit-content; background-color: rgb(64, 64, 64);">
+                <div style = "margin:10px;">
+                    <div style = "user-select: none;">
+                        Circuit Simulator v3.9
+                    </div>
+                    <input id = "labelNodesCheckbox" type="checkbox" > Label Nodes   </input> 
+                    <br>
+                    <input id = "labelNodeValuesCheckbox" type="checkbox" > Label Node Voltages</input>
+                    <br>
+                    <input id = "labelComponentValuesCheckbox" type="checkbox" checked> Label Component Values</input>
+                    <br>
+                    <input id = "labelComponentNamesCheckbox" type="checkbox" > Label Component Names</input>
+                    <!--<br>
+                    <input id = "colorComponentsCheckbox" type="checkbox" checked = "false"> Color Components </input>-->
+                    <div style="display:flex; flex-wrap:wrap; width:400">
+                        <div id = "startStopButton", class = 'ui_button' style = "background-color: green;" onclick = StartStopButtonClick()>
+                            Stop Simulation
+                        </div>
+                        <div id = "resetButton", class = 'ui_button' onclick = ResetButtonClick()>
+                            Reset
+                        </div>
+                    </div>
+                    <div id = "centerCircuitButton", class = 'ui_button' onclick = CenterCircuit()>
+                        Center Circuit
+                    </div>
+                    <div style = "display:flex;">
+                        Simulation Speed
+                        <div style = "padding: 5px;">
+                            <input id = simulationSpeedSlider class = "slider" type = "range" width = 100 max = 31 value = 25 min = 1 onchange = simulationSpeedSliderChanged()></slider>
+                        </div>
+                    </div>
+                    <div>
+                        TimeStep
+                        <input id = "timeStepTextbox" class = "gridInput" onchange = "simulationTimeStepChanged(this)" spellcheck="false">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Drawmode and component info -->
+            <div style="margin:20px; width:400px;  background-color: rgb(64, 64, 64);">
+                <div style = "margin:10px;">
+                    <div id = "drawMode" style = "user-select: none;">
+                        Draw Mode:
+                    </div>
+                    <div id = "selectedComponent" style = "user-select: none; size:5px;">
+                        Selected Component: -1 (none)
+                    </div>
+                    <div>
+                        Component Value: 
+                        <input id = "valueInputText" class = "InputText" onclick = "valueInputTextClicked()">
+                    </div>
+
+                    <div style="display:flex;">
+                        <div id = "addPlotButton", class = 'ui_button' onclick = AddPlotButtonClick()>
+                            Plot Component
+                        </div>
+                        <div id = "increasePlotScaleButton", class = 'ui_button' onclick = IncreasePlotScaleButtonClick()>
+                            Increase Plot Scale
+                        </div>
+                        <div id = "decreasePlotScaleButton", class = 'ui_button' onclick = DecreasePlotScaleButtonClick()>
+                            Decrease Plot Scale
+                        </div>
+                        <div id = "removePlotButton", class = 'ui_button' onclick = RemovePlotButtonClick()>
+                            Remove Plot
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Component Specific Variables  & Input -->
+            <div id = "inputGrid" style="margin:20px; width:fit-content;  background-color: rgb(64, 64, 64);">
+                <div style="margin:10px;">
+                    <div style="display:flex">
+                        <div>
+                            <div id = "gridText0" class = 'gridText'>
+                                -
+                            </div>
+                            <div id = "gridText1" class = 'gridText'>
+                                -
+                            </div>
+                            <div id = "gridText2" class = 'gridText'>
+                                -
+                            </div>
+                            <div id = "gridText3" class = 'gridText'>
+                                -
+                            </div>
+                            <div id = "gridText4" class = 'gridText'>
+                                -
+                            </div>
+                        </div>
+                        <div >
+                            <input id = "gridInput0" class = "gridInput" onclick = "GridInputClicked(this)" spellcheck="false">
+                            <input id = "gridInput1" class = "gridInput" onclick = "GridInputClicked(this)" spellcheck="false">
+                            <input id = "gridInput2" class = "gridInput" onclick = "GridInputClicked(this)" spellcheck="false">
+                            <input id = "gridInput3" class = "gridInput" onclick = "GridInputClicked(this)" spellcheck="false">
+                            <input id = "gridInput4" class = "gridInput" onclick = "GridInputClicked(this)" spellcheck="false">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Component Selector Box -->
+        <div style="margin:20px; margin-top: 0; width:fit-content;  background-color: rgb(64, 64, 64);">
+            <div style = "display:flex; flex-wrap:wrap;">
+                <div style = "margin: auto; padding:5px;">
+                    Draw Component:
+                </div>
+                <div class = "ui_button" onclick = ComponentButtonClicked(this) id = "text">
+                    text
+                </div>
+                <div class = "ui_button" onclick = ComponentButtonClicked(this) id = "wire">
+                    wire
+                </div>
+                <div class = "ui_button" onclick = ComponentButtonClicked(this) id = "switch">
+                    switch
+                </div>
+                <div class = "ui_button" onclick = ComponentButtonClicked(this) id = "resistor">
+                    resistor
+                </div>
+                <div class = "ui_button" onclick = ComponentButtonClicked(this) id = "capacitor">
+                    capacitor
+                </div>
+                <div class = "ui_button" onclick = ComponentButtonClicked(this) id = "inductor">
+                    inductor
+                </div>
+                <div class = "ui_button" onclick = ComponentButtonClicked(this) id = "ground">
+                    ground
+                </div>
+                <div class = "ui_button" onclick = ComponentButtonClicked(this) id = "voltageSource2n">
+                    voltageSource2n
+                </div>
+                <div class = "ui_button" onclick = ComponentButtonClicked(this) id = "currentSource">
+                    currentSource
+                </div>
+                <div class = "ui_button" onclick = ComponentButtonClicked(this) id = "freqSweep">
+                    frequencySweep
+                </div>
+                <div class = "ui_button" onclick = ComponentButtonClicked(this) id = "opamp">
+                    opamp
+                </div>
+                <div class = "ui_button" onclick = ComponentButtonClicked(this) id = "diode">
+                    diode
+                </div>
+                <div class = "ui_button" onclick = ComponentButtonClicked(this) id = "zenerDiode">
+                    zener diode
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Canvas -->
+        <canvas id = "circuitCanvas" , onmousemove = mouseMoved(event) , onmousedown = mousePressed(event) onmouseup = mouseReleased(event) , width = 1000 , height = 700></canvas>
+        
+        <!-- Description and such -->
+        <div style = "margin:auto; padding:20px; justify-content: center; justify-self: center; width:80%;">
+            <div style="font-weight: bold;">
+                Key Bindings:
+            </div>
+            w=wire, s=switch, 
+            <br>r=resistor, c=capacitor, l=inductor,
+            <br> g=ground, v=signal generator, V=voltageSource, i=currentSource, 
+            <br> d=diode, z=zener diode, a=op amp
+            <br>'<'=increasePlotTimeScale, '>'=decreasePlotTimeScale
+            <br> 'delete' = Remove All Components
+            <br> 'backspace' = Remove Selected Component
+            <br><br>
+            
+            <div style="font-weight: bold;">
+                How It Started:
+            </div>
+
+            This project started after I took my first introductory Electrical Engineering course. I had learned Ohms Law, KCL, and KVL and believed that with those basic laws I could simulate the
+            most basic circuits. Since then I have learned methods for calculating circuits using differential equations and why simulators like this one are rarely used.
+            
+            <br><br>
+            <div style="font-weight: bold;">
+                How It Works:
+            </div>
+            This simulator, in essence, is just a nodal analysis calculator (KCL) with a basic UI slapped on the front.
+            
+            It simulates components like capacitors and inductors as though they are voltage and current sources, with approximations being made each time step to
+            determine the next capacitor and inductor voltage and current values. For each time step, the simulator generates equations for the voltage of each node using the fundamental components
+            (resistors, voltage sources/capacitors, and current sources/inductors), assembles all of the equations into a matrix, and uses Gaussian elimination to find the voltage of each node.
+            Using the node voltages, KCL, and ohms law, the simulator finds the current through each component. Capacitors and Inductors have their voltages and currents updated accordingly, and
+            the next cycle begins.
+
+            For each time step the user sees (in the scope and in the text overlays) the simulator actually simulates 1000 cycles. This is done to improve the simulation accuracy: the smaller the time
+            step, the less error is added each cycle. Thus, the simulator uses a tiny time step (1nS is the default).
+
+            As for the UI, I am using HTML canvases and a basic canvas painter class I wrote to draw the circuit and text to the screen. 
+            At the moment this is fairly inefficent and uses an unacceptable amount of computing power for how little it is actually doing.
+            I am not proud of this and plan to change the entire graphics engine to webGL to offload the processing power from the CPU to the GPU.
+            I have not done this yet because I will need to create vertice-based models of each of the components, which I suspect will be a painfully time-consuming process.
+            <br>
+            <br>
+            <div style="font-weight: bold;">
+                Future Plans:
+            </div>
+            In the future I would like to make many changes to the UI and core simulation algorithms. 
+
+            For starters, each time step the Ax=B matrices which are used to find 
+            the node voltages are completely remade each time step. This is inefficient because the circuit does not change each cycle, with only voltage, current, and resistive values being changed
+            each cycle. Secondly, I may be able to derive formulas based on component values for each node voltage and be able to use the GPU to crunch the linear equations, freeing up the CPU for other
+            logic functions.
+            
+            Finally, I am using a KCL and KVL with no differential equations at all. If I wanted to dramatically increase performance, I would need to create a differential equation solver
+            and make my simulator more akin to that of traditional SPICE simulators.
+
+            <br>
+            <br>
+            <br>
+        </div>
+
+</body>
+
+<script src="../../script.js"></script>
+<script src="../../point.js"></script>
+<script src="../../painter.js"></script>
+<script src="../../utilities.js"></script>
+<script src="circuitSaves.js"></script>
+<script src="node.js"></script>
+<script src="plot.js"></script>
+<script src="component.js"></script>
+<script src="graphics.js"></script>
+<script src="circuitSimulator.js"></script>
+
+
+</html>

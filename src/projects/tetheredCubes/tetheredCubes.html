@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zack Gunther</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../menu.css">
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.ico" />
+</head>
+
+<style>
+    #canvasOverlay {
+        opacity: 0.2;
+        transition: opacity 0.1s, max-height 2s;
+        max-height: 3rem;
+        overflow: hidden;
+    }
+    #canvasOverlay:hover {
+        opacity:1;
+        max-height: 100vh;
+    }
+    td{
+        font-size:small;
+    }
+</style>
+
+<body id="Background" style="display:block; position:relative">
+
+    <!-- Menu Goes Here -->
+
+    <div style = 'display: flex; width: 100%; height:fit-content; justify-content: center;'>
+        <h1>
+            Tethered Cubes
+        </h1>
+    </div>
+
+    <div style="padding: 1vh 5vw 1vh 5vw;">
+        This project started as a soft body simulator, and quickly diverged from desired.
+        I started with a 3d grid of cubes. Each cube is tethered to six other cubes: above, below, left, right, front, and back.
+        Each tether acts as a spring, and applies forces to both cubes it's between.
+        As these tethers do not care about the angle between the cubes (only distance), the structure quickly falls apart. 
+        When you tune the force multiplier, velocity dampening, and velocity multiplier just right, you get this interesting simulation.
+        The coloring of each cube represents it's current velocity.
+    </div>
+
+    <div style="width:90vw; margin-left:5vw; height: 98%; display: block; position: relative;">
+        <canvas id="mainCanvas" style="width:90vw; height: 90vh; display: block; position: absolute; top:0; left:0;"></canvas>
+        <div id="canvasOverlay" style="display: block; position: absolute; top:0; left:0;">
+            <table style="background-color: rgba(255,255,255,0.1); border-radius: 0.4rem; margin:1rem; padding:0.2rem; color:rgb(150,150,150);" > 
+                <tr>
+                    <td>Force Multiplier</td>
+                    <td><input id="forceMultiplierInput" type="range" min="0" max="1" step="0.01" value="0.1"></td>
+                </tr>
+                <tr>
+                    <td>Velocity Dampening Multiplier</td>
+                    <td><input id="velocityDampeningMultiplierInput" type="range" min="0.8" max="1" step="0.01" value="0.99"></td>
+                </tr>
+                <tr>
+                    <td>Velocity Multiplier</td>
+                    <td><input id="velocityMultiplierInput" type="range" min="0" max="1" step="0.01" value="0.2"></td>
+                </tr>
+                <tr>
+                    <td>Fixed Coloring</td>
+                    <td><input id="fixedColoringInput" type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td>Apply Attractive Force</td>
+                    <td><input id="applyForceInput" type="checkbox" checked></td>
+                </tr>
+                <tr>
+                    <td>Color Multiplier</td>
+                    <td><input id="colorMultiplierInput" type="range" min="0" max="1" step="0.01" value="0.9"></td>
+                </tr>
+                <tr>
+                    <td>Grid Size</td>
+                    <td><input id="gridSizeInput" type="range" min="3" max="30" step="1" value="10"></td>
+                </tr>
+                <tr>
+                    <td>Bounding Box Size</td>
+                    <td><input id="boundingBoxMultiplierInput" type="range" min="0" max="3" step="0.1" value="1.2"></td>
+                </tr>
+                <tr>
+                    <td>Zero velocity on bounding box collision</td>
+                    <td><input id="zeroVelocityOnCollisionInput" type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td>Frame rate</td>
+                    <td><input id="framerateInput" type="range" min="5" max="60" step="5" value="25"></td>
+                </tr>
+                
+                <tr>
+                    <td colspan="2"> 
+                        <button onclick="reset_grid()" style="background-color: rgb(100,100,100); border-radius: 0.3rem; width:100%; padding: 0.2rem">
+                            Reset
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</body>
+
+<script src="../../script.js"></script>
+<script src="tetheredCubes.js"></script>
+</html>
+
+
+
+
+
+
+
+
+

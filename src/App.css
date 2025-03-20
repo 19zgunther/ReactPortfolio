@@ -1,38 +1,291 @@
+/* Global Styles */
+.dark-theme {
+  --bg-primary: #1e1e1e;      /* Dark background */
+  --bg-secondary: #252526;    /* Slightly lighter background */
+  --text-primary: #a2b8d2;    /* Light blue-gray for main text */
+  --text-secondary: #5c6b8a;  /* Darker blue-gray for secondary text */
+  --accent-color: #f07838;    /* Bright orange for emphasis */
+  --accent-hover: #ba4c40;    /* Darker orange for hover states */
+  --hover-bg: #2a2d2e;        /* Slightly lighter than bg-secondary */
+  --border-color: #5c6b8a;    /* Blue-gray for borders */
+  --highlight-color: #f5c9a8; /* Light orange for subtle highlights */
+}
+
 .App {
-  text-align: center;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  z-index: -2;
+  height: fit-content;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Navigation Bar */
+.navbar {
+  background-color: var(--bg-secondary);
+  padding: 0.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  width: calc(100% - 4rem);
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid var(--border-color);
+  height: 3rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.nav-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--accent-color);
+  content: 'zgunther';
+  transition: color 0.3s ease;
 }
 
-.App-header {
-  background-color: #282c34;
+.nav-brand a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.nav-brand a:hover,
+.nav-brand a:visited,
+.nav-brand a:active,
+.nav-brand a:focus {
+  color: var(--accent-hover);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: var(--accent-color);
+}
+
+/* Main Content Sections */
+main {
+  padding-top: 1rem;
+}
+
+section {
+  padding: 4rem 2rem;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* Hero Section */
+.hero-section {
+  background-color: var(--bg-primary);
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  padding-top: 0rem;
 }
 
-.App-link {
-  color: #61dafb;
+.hero-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  max-width: 1200px;
+  padding: 0 2rem;
+  position: relative;
 }
 
-@keyframes App-logo-spin {
+.hero-text {
+  text-align: left;
+  opacity: 0;
+  margin-left: 450px;
+  animation: fadeInRight 1s ease-in forwards;
+  animation-delay: 2s;
+  width: 100%;
+  max-width: 600px;
+}
+
+.hero-text h1 {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.about-text {
+  margin-top: 1.5rem;
+  line-height: 1.6;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  max-width: 500px;
+}
+
+/* Project Grid */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 2rem;
+}
+
+.project-card {
+  background-color: var(--bg-secondary);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.3s ease;
+}
+
+.project-card:hover {
+  background-color: var(--hover-bg);
+  transform: translateY(-5px);
+  border-color: var(--accent-color);
+}
+
+/* Profile Image */
+.profile-image {
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid var(--accent-color);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: fadeInAndSlide 2s ease-in-out forwards;
+}
+
+.profile-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(20px);
+  animation: unblur 0.3s ease-out forwards;
+  animation-delay: 0.1s;
+}
+
+/* Add unblur animation */
+@keyframes unblur {
   from {
-    transform: rotate(0deg);
+    filter: blur(20px);
   }
   to {
-    transform: rotate(360deg);
+    filter: blur(0);
   }
+}
+
+/* Update animations */
+@keyframes fadeInAndSlide {
+  0% {
+    opacity: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  50% {
+    opacity: 1;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  100% {
+    opacity: 1;
+    left: 0;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Update responsive design */
+@media (max-width: 1024px) {
+  .hero-content {
+    gap: 2rem;
+  }
+  
+  .hero-text h1 {
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .profile-image {
+    position: relative;
+    left: auto;
+    transform: none;
+    width: 300px;
+    height: 300px;
+    animation: fadeIn 1s ease-in forwards;
+  }
+
+  .hero-text {
+    text-align: center;
+    margin-left: 0;
+  }
+
+  .about-text {
+    margin: 1rem auto;
+  }
+
+  .profile-image img {
+    animation: unblur 1s ease-out forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Resume Page */
+.resume-container {
+  width: 100%;
+  height: calc(100vh - 4rem); /* Subtract navbar height */
+  margin-top: 4rem; /* Account for navbar */
+  background-color: var(--bg-primary);
+  z-index: 1000;
+}
+
+.resume-container object {
+  background-color: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Add this to your existing App.css */
+.project-page {
+  padding-top: 4rem; /* Match navbar height */
+  min-height: 100vh;
+  height: fit-content;
 }

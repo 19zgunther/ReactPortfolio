@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zack Gunther</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../menu.css">
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.ico" />
+</head>
+
+<body id="Background">
+
+    <!-- Menu Goes Here -->
+
+    <div style = 'display: flex; width: 100%; justify-content: center;'>
+        <h1>
+            CNC Router Development
+        </h1>
+    </div>
+
+    <!-- <div style = 'display: flex; width: 100%; justify-content: center; flex-wrap:wrap;'>
+        <canvas id='snakeCanvas'              style='height: 45vmin; aspect-ratio: 1/1; padding: 2vmin;'></canvas>
+        <canvas id='snakeNeuralNetworkCanvas' style='height: 45vmin; aspect-ratio: 1/1; padding: 2vmin;'></canvas>
+    </div> -->
+    <div style = 'display: flex; width: 100%; justify-content: center; flex-wrap:wrap;'>
+        <!-- <canvas id='mainCanvas' style='width: 95%; height: 70%; padding: 2vmin;border-radius: 3vmax;'></canvas> -->
+    </div>
+    
+    <!-- <div style = 'display: flex; width: 100%; justify-content: center; padding-bottom: 5vmin; '>
+        <div style='width:fit-content; height:fit-content; background-color: white; color:black; cursor: pointer; padding: 1vmin;' onclick='reset()'>
+            Reset
+        </div>
+    </div> -->
+
+
+
+    <!-- <div style = 'display: flex; width: 100%; justify-content: center;'>
+        <div style='width: 80vw; margin-bottom: 5vmin;'>
+            I recently purchased a 3D printer with the intent to learn more about robotics and mechanical assemblies.
+            I was thrilled by my $160 base-model Ender 3's accuracy and detail, but was seriously disappointed at the amount of time it took to print even the smallest part.
+            Because I knew I wanted to work on larger projects in the future, I decided to use my new 3D printer to create a CNC router so I could cut plywood and other such materials rapidly.
+            <br><br>
+            Instead of simply downloading and printing freely available designs for simple three-axis routers from other creators, I set out to design my own from scratch.
+            This is the current design for my CNC router for which I have designed all of the circuitry. 
+            I also programmed the controller and slicer to be able to take images and create router designs easily.
+            <br><br>
+            This project is very much ongoing, and I am hoping to show some of the results here soon! 
+            <br><br>
+            <a href="assemblyData.obj" download="assemblyData.obj">
+                Click to download assembly object
+            </a>
+        </div>
+    </div> -->
+    <style>
+        h2{
+            margin: 0;
+            font-size:xx-large;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+        }
+        p{
+            margin-left: 3vw;
+            margin-right: 3vw;
+        }
+    </style>
+
+    <div style = 'display: flex; width: 100%; justify-content: center; border-radius: 3rem;'>
+        <div style='width: 80vw; margin-bottom: 5vmin;border-radius: 3rem;'>
+            <h2>Problem Statement</h2>
+            <p>
+                Over the years I have enjoyed making experimental guitar pedals and amplifiers but have always 
+                been frustrated by how long it takes to solder together circuits on perf boards, and how issue-prone
+                prototyping on breadboards can be. The best way to test such equipment is to order custom PCBs, and 
+                then to solder the components in place manually. Unfortunately, ordering custom PCBs is either expensive or 
+                requires patience as manufacturing and shipping times can easily add up to multiple weeks. Thus, if I want
+                to be able to prototype my circuits more rapidly, I need to find a way to make PCBs at home.
+            </p>
+
+            <br><br>
+
+            <h2>Overview of PCB Manufacturing Methods</h2>
+            <p>
+                There are two main ways to manufacture PCBs. The industry standard way is to etch copper clad circuit boards
+                using a corrosive solution to remove unwanted copper and a resin mask to shield the wanted copper (the traces)
+                from the corrosive solution. This method also requires the use of a CNC router to cut the board perimeter, drill holes for vias, 
+                and mounting holes for through-hole components. 
+                <br><br>
+                The second method for creating PCBs is to simply use a router to make isolation cuts in the copper cladding to isolate circuit traces.
+                As both methods require a CNC router, and one requires extra steps involving corrosive chemical, I decided to make PCBs using the
+                latter PCB milling method.
+            </p>
+
+            <br><br>
+
+            <h2>Project Overview</h2>
+            <div style="margin: 0% 5% 0% 5%">
+                <l>
+                    <li><b>CNC Router Assembly</b> - An inexpensive & compact cnc router capable of <0.1mm precision in each dimension</li>
+                    <br>
+                    <li><b>CNC Motor Controller</b> - An embedded system that receives commands via USB, maintains relative router positioning, and drives stepper motors</li>
+                    <br>
+                    <li><b>Router GUI Application</b> - An application that sends path commands to the router & allows user to start, pause/resume, and stop router programs as well as jog the router for relative positioning</li>
+                    <br>
+                    <li><b>Image-Based PCB Slicer</b> - A program that takes a screenshot of a PCB & width information, and outputs a path that isolates all of the traces from one another</li>
+                </l>
+            </div>
+
+            <br><br>
+
+            <h2>CNC Router Assembly</h2>
+            <div>
+                <canvas id='mainCanvas' style='width: 99%; height: 70vh; border-radius: 0.5rem;'></canvas>
+                <div style="display:flex; align-items: center;">
+                    <img src="IMG_7620.JPG" style="width:99%; margin: auto; border-radius: 0.5rem;">
+                </div>
+            </div>
+
+            <br><br>
+
+            <h2>CNC Motor Controller</h2>
+            <div>
+                <img src="Schematic_CncRouterDriver_2023-04-10.png" style="width: 99%; border-radius: 0.5rem;">
+            </div>
+
+            <br><br>
+
+            <h2>Controller GUI Application</h2>
+            <div style="display:flex; align-items: center;">
+                <img src="guiScreenshot.png" style="width:50%; margin: auto;border-radius: 0.5rem;">
+            </div>
+
+            <br><br>
+
+            <h2>Image-Based PCB Slicer</h2>
+            <div>
+                <style>
+                    .third{
+                        width:30%; 
+                        text-align: center; 
+                        margin:0% 1.5% 0% 1.5%;
+                        margin-top: 0;
+                        font-size: smaller;
+                        border-radius: 0.5rem;
+                    }
+                    .whole{
+                        width:97%; 
+                        text-align: center; 
+                        margin: 1.5%;
+                        border-radius: 0.5rem;
+                    }
+                </style>
+                <div class="whole">Isolation Cuts with router bit radial offset:</div>
+                <div style="display:flex">
+                    <div class="third">Input Image</div>
+                    <div class="third">Sliced Preview Image</div>
+                    <div class="third">Milled PCB</div>
+                </div>
+                <div style="display:flex">
+                    <img src="PCB_inputImg.png" class="third">
+                    <img src="PCB_outputImg_Straight.png" class="third">
+                    <img src="pcb.png" class="third">
+                </div>
+                <div class="whole">Isolation Cuts with trace expansion:</div>
+                <div style="display:flex">
+                    <div class="third">Input Image</div>
+                    <div class="third">Sliced Preview Image</div>
+                    <div class="third">Milled PCB</div>
+                </div>
+                <div style="display:flex">
+                    <img src="PCB_inputImg.png" class="third">
+                    <img src="PCB_outputImg_Rounded.png" class="third">
+                    <img src="pcb2_bottom.png" class="third">
+                </div>
+                <div class="whole">Isolation Cut Expansion Gradient Image:</div>
+                <div style="display:flex; align-items: center;">
+                    <img src="GradientExampleImg_v2.png" style="margin: auto;" class="third">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+<script src="../../script.js"></script>
+<script src="../CAD/myMath.js"></script>
+<script src="../easyGL/easyGL.js"></script>
+<script src="../easyGL/OBJFileRenderer.js"></script>
+<script src="cncRouterData2.js"></script>
+<script src="cncRouter.js"></script>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zack Gunther</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../menu.css">
+    <link rel="stylesheet" href="planetGenerator.css">
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.ico" />
+</head>
+
+<body style = "background-color: rgba(0,0,0,1);">
+    
+    <!-- Menu Goes Here -->
+
+    <div style='width: 100%; justify-content: center; text-align: center; font-size: 5em;'>
+        <h1>
+            WebGL Planet Generator
+        </h1>
+    </div>
+
+
+    <div display='inline-block' style='height:fit-content;'>
+        <canvas id='glcanvas' style = 'width:90%; height:90%; padding:0%; margin:0%; z-index: -100'></canvas>
+        <div style='position:relative; bottom:0%;padding: 2%;'>
+            <!-- <div style='width:fit-content;'>
+                <div class = 'defaultButton' onclick = addAstroids()>
+                    Add Astroids
+                </div>
+                <div class = 'defaultButton' onclick = addSatellites()>
+                    Add Satellites
+                </div>
+                <div class = 'defaultButton' onclick = resetObjects()>
+                    Reset
+                </div>
+            </div>
+            <br>
+            fov:
+            0<input id = 'fovSlider' type='range' min=0 max=180 step=0.1 value='10' onchange = updateCameraSettings()>180
+            <br>
+            zfar:
+            0<input id = 'zFarSlider' type='range' min=0 max=100 step=0.1 onchange = updateCameraSettings()>100
+            <br>
+            zNear:
+            0<input id = 'zNearSlider' type='range' min=0 max=10 step=0.1 value = '4' onchange = updateCameraSettings()>10
+            <br>
+            sunRotationSpeed:
+            0<input id = 'zNearSlider' type='range' min=0 max=1 step=0.1 value =0 oninput = setSunRotateSpeed(this)>1
+            <br>
+            <br> -->
+            <div style = 'font-style: italic;'>
+                Use WASD to move camera origin <br>
+                Left & Right arrows change orbit & rotation speeds
+            </div>
+        </div>
+    </div>
+
+    <div style='margin: 10%; margin-top: 1%;'>
+        <div style='font-size:larger'>
+            About this project
+        </div>
+        <div>
+            I have always been interested in procedurally generated terrain and objects, but never really knew where to start. While browsing the internet 
+            one day I came across a cartoon-ish rendering of Earth, inspiring me to experiment with planet generation.
+            <br> <br>
+            For this project I learned WebGL as opposed to basic html contexts for increased performace, as I knew I would likely need to render thousands of triangles each frame (30 times per second).
+            WebGL requires all object models to be defined in the vertice-indice model, where vertices are 3d points in space and the indices are triples of vertice indexes defining triangles.
+            <br><br>
+            To generate the spherical planet I started with an octohedron, and iteratively subdivided each triangle into four smaller triangles. At the end of each division iteration, 
+            each vertex was normalized to scale it all to a unit sphere.
+            <br><br>
+            Now, to modify the sphere and color it accordingly, I experimented with a few different methods. First, I tried to randomly extend or contract each vertex, and 
+            was left with a fuzzy little sphere which didn't look at all like a planet. Second, I experimented with pushing regions in or out of varying sizes 
+            with the hope of producing mountain ranges and canyons and such. This method did work, but the runtime was too long for my liking (>10 seconds for small planets).
+            Third, I implemented a basic pseudo-random number generator/hasher and with that perlin noise. By layering a multiple differnet frequencies of perlin noise 
+            and offsetting each layer with more random noise, I was able to produce what you now see in the rendering.
+            <br><br>
+            To color the now lumpy sphere I found the minimum and maximum vertex heights and scaled a color gradient to fit within the range. Thus, in two loops I could color
+            each vertex, producing a earth-like model.
+            <br><br>
+            Along with coloring, I also added perlin noise in the fragment shader to each surface to modify the normal vectors and colors. This greatly
+            improved the perceived resolution with minimal computational cost.
+            <br><br>
+            As for the oceans, I decided to split the model and generate a smooth, semi-transparent blue sphere to go over the existing model. This, with the 
+            addition of some elongated noise, produces the appearance of an ocean. Unfortunately, I have not yet implemented depth testing, thus the water is the same 
+            color regardless of depth and viewing angle.
+            <br><br>
+            Overall, I am satisfied with the planet, although in the future I would like to add an atmosphere and a better ocean.
+        </div>
+        <br>
+    </div>
+
+    <br><br><br><br><br><br>
+
+
+
+
+</body>
+
+<script src="../../script.js"></script>
+<script src="../CAD/myMath.js"></script>
+<script src="../easyGL/easyGL.js"></script>
+<script src="gl.js"></script>
+<!-- <script src="planetGenerator2.js"></script> -->
+<script src="moonGenerator2.js"></script>
+
+</html>

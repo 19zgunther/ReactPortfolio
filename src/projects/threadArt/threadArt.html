@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zack Gunther</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../menu.css">
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.ico" />
+</head>
+
+<body id="Background">
+
+    <!-- Menu Goes Here -->
+
+    <div style = 'display: flex; width: 100%; justify-content: center;'>
+        <h1>
+            Thread Art Generator
+        </h1>
+    </div>
+    <div style = 'display: flex; width: 100%; justify-content: center;'>
+        <div style="display:block; width: fit-content; max-width: 80vw;">
+            <h2>How to use this tool:</h2>
+            <br>
+            1. Select an image from your computer. Black and white images work better, but color images will be converted to grayscale automatically
+            <br><br>
+            2. Select the nail/pin/point arrangement style, as well as the number of points. This will determine the nails the thread will be able to loop around.
+            <br><br>
+            3. Click and drag to move the image around the left canvas. Center it with the pins. You can also zoom by scrolling/using the mouse wheel on the canvas
+            <br><br>
+            4. Press generate, and wait for up to 10 seconds, as the path finding algorithm is fairly computationally intense.
+            <br><br>
+            5. Play with the different options available:
+            <br>
+            <div style="padding-left:2rem">
+                <br>
+                <b>Perceived thread weight:</b> An arbitrary value used in the path finding algorithm. It determines the number of times threads will have to pass over a pixel for it's theoretical color to go from white to black.
+                <br><br>
+                <b>Min Jump Distance Canvas Percent:</b> The minimum percentage of the screen each thread length must take to be valid. We don't want a thread going back and forth between two nearby pins.
+                <br><br>
+                <b>Max Jump Distance Canvas Percent:</b> The maximum percentage of the screen each thread length can take to be valid. Same as above, just an upper bound.
+                <br><br>
+                <b>Max Num Threads:</b> The maximum number of threads/sections/lengths/jumps-between-pins the algorithm will pathfind.
+                <br><br>
+                <b>Thread Path Render Percent:</b> The number of threads/sections/etc being rendered to the canvas
+            </div>
+        </div>
+    </div>
+    
+
+    <style>
+        table {
+            border-collapse:collapse; 
+        }
+        tr {
+            border:1px solid white;
+            padding: 1vmin;
+        }
+        td {
+            padding:  0.5vmin;
+        }
+
+        select {
+            color:black;
+        }
+        option { color:black;}
+    </style>
+    
+    <div style = 'display: flex; width: 100%; justify-content: center; flex-wrap:wrap;'>
+        <table>
+            <tr>
+                <td colspan="3">
+                    <input type="file" id="imageInput" accept = "image/*">
+                </td>
+            </tr>
+            <tr>
+                <td>Nail/Point configuration</td>
+                <td>
+                    <select id="pointConfigurationInput">
+                        <option>Circle</option>
+                        <option>Circle with Center</option>
+                        <option>Square</option>
+                        <option>Grid</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Num Points</td>
+                <td><input id="numPointsInput" type="range" min="0" max="800" value="300" step="10"></td>
+                <td id="numPointsOutput"></td>
+            </tr>
+            <tr>
+                <td>Perceived thread weight</td>
+                <td><input id="perceivedThreadWeightInput" type="range" min="0.001" max="0.1" step="0.001" value="0.05"></td>
+            </tr>
+            <tr>
+                <td>Min Jump Distance Canvas Percent</td>
+                <td><input id="minJumpDistanceInput" type="range" min="0" max="1" step="0.001" value="0.1"></td>
+            </tr>
+            <tr>
+                <td>Max Jump Distance Canvas Percent</td>
+                <td><input id="maxJumpDistanceInput" type="range" min="0.1" max="1" step="0.001" value="1"></td>
+            </tr>
+            <tr>
+                <td>Max Num Threads</td>
+                <td><input id="maxNumThreadsInput" type="range" min="100" max="20000" step="100" value="10000"></td>
+                <td id="maxNumThreadsOutput"></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <button id="generateLinesButton" style="background-color: rgb(100,100,100); width:100%;">generate</button>
+                </td>
+            </tr>
+            <tr>
+                <td>Thread Path Render Percent</td>
+                <td><input id="threadPathRenderPercentInput" type="range" min='0' max='1' step='0.01' value='1'></td>
+                <td id="threadPathRenderPercentOutput"></td>
+            </tr>
+            <tr>
+                <td>Thread render weight</td>
+                <td><input id="threadRenderWeightInput" type="range" min="1" max="9" step="1" value="2"></td>
+            </tr>
+        </table>
+    </div>
+
+    
+    <div style = 'display: flex; width: 100%; justify-content: center; flex-wrap:wrap;'>
+        <canvas id='imageCanvas'  style='height: 45vw; aspect-ratio: 1/1; padding: 2vmin;'></canvas>
+        <canvas id='threadCanvas' style='height: 45vw; aspect-ratio: 1/1; padding: 2vmin;'></canvas>
+    </div>
+    <button id="exportDataButton">Export Data to Console</button>
+</body>
+
+<script src="../../script.js"></script>
+<!-- <script src="../../point.js"></script> -->
+<script src="../../painter.js"></script>
+<script src="threadArt.js"></script>
+</html>
