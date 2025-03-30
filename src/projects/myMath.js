@@ -947,7 +947,11 @@ class vec4 {
     {
         return ((Math.abs(this.x-vec.x) + Math.abs(this.y-vec.y) + Math.abs(this.z-vec.z)) < delta)
     }
+    distTo(vec) {
+        return Math.sqrt(Math.pow(this.x-vec.x, 2) + Math.pow(this.y-vec.y, 2) + Math.pow(this.z-vec.z, 2));
+    }
 }
+
 
 
 

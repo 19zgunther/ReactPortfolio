@@ -29,11 +29,14 @@ function generatePoints(count, dimensions) {
 }
 
 
-var mousePos = { x: 0, y: 0 };
-var mouseVelocity = { x: 0, y: 0 };
-var lastMousePos = { x: 0, y: 0 };
-var backgroundVarRenderItr = 0;
-var backgroundVarRenderCache = [];
+
+var backgroundGlobals = {
+    mousePos: { x: 0, y: 0 },
+    mouseVelocity: { x: 0, y: 0 },
+    lastMousePos: { x: 0, y: 0 },
+    backgroundVarRenderItr: 0,
+    backgroundVarRenderCache: [],
+}
 
 function Background() {
     const repelRadius = 50; // Distance at which points start being affected
@@ -82,23 +85,24 @@ function Background() {
             // Clear canvas with a semi-transparent dark background
             ctx.clearRect(0, 0, dimensions.width, dimensions.height);
 
-            ctx.fillStyle = 'rgba(100, 100, 100, 0.8)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+            ctx.fillRect(0, 0, dimensions.width, dimensions.height);
 
             const time = Date.now() * colorSpeed;
 
             // Calculate current mouse speed
-            const mouseSpeed = Math.sqrt(mouseVelocity.x * mouseVelocity.x + mouseVelocity.y * mouseVelocity.y);
+            const mouseSpeed = Math.sqrt(backgroundGlobals.mouseVelocity.x * backgroundGlobals.mouseVelocity.x + backgroundGlobals.mouseVelocity.y * backgroundGlobals.mouseVelocity.y);
             const repelFactor = mouseSpeed;
 
             // Decay mouse velocity
-            mouseVelocity.x *= 0.99;
-            mouseVelocity.y *= 0.99;
+            backgroundGlobals.mouseVelocity.x *= 0.99;
+            backgroundGlobals.mouseVelocity.y *= 0.99;
 
-            backgroundVarRenderItr += 1;
+            backgroundGlobals.backgroundVarRenderItr += 1;
 
             let computeCache = false;
-            if (backgroundVarRenderItr % 2 === 0 || backgroundVarRenderCache.length === 0) {
-                backgroundVarRenderCache = [];
+            if (backgroundGlobals.backgroundVarRenderItr % 2 === 0 || backgroundGlobals.backgroundVarRenderCache.length === 0) {
+                backgroundGlobals.backgroundVarRenderCache = [];
                 computeCache = true;
             }
 
@@ -110,12 +114,12 @@ function Background() {
                 const row = points[i];
                 let cacheRow = [];
                 if (!computeCache) {
-                    cacheRow = backgroundVarRenderCache[i];
+                    cacheRow = backgroundGlobals.backgroundVarRenderCache[i];
                 }
                 for (let j = 0; j < row.length; j++) {
                     const point = row[j];
-                    const dx = point.x - mousePos.x;
-                    const dy = point.y - mousePos.y;
+                    const dx = point.x - backgroundGlobals.mousePos.x;
+                    const dy = point.y - backgroundGlobals.mousePos.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
 
                     // Calculate opacity based on distance
@@ -340,14 +344,14 @@ function Background() {
     useEffect(() => {
         const handleMouseMove = (event) => {
             // Calculate mouse velocity
-            mouseVelocity.x = event.clientX - lastMousePos.x;
-            mouseVelocity.y = event.clientY - lastMousePos.y;
+            backgroundGlobals.mouseVelocity.x = event.clientX - backgroundGlobals.lastMousePos.x;
+            backgroundGlobals.mouseVelocity.y = event.clientY - backgroundGlobals.lastMousePos.y;
 
             // Update positions
-            lastMousePos.x = mousePos.x;
-            lastMousePos.y = mousePos.y;
-            mousePos.x = event.clientX;
-            mousePos.y = event.clientY;
+            backgroundGlobals.lastMousePos.x = backgroundGlobals.mousePos.x;
+            backgroundGlobals.lastMousePos.y = backgroundGlobals.mousePos.y;
+            backgroundGlobals.mousePos.x = event.clientX;
+            backgroundGlobals.mousePos.y = event.clientY;
         };
 
         window.addEventListener('mousemove', handleMouseMove);

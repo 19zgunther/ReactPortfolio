@@ -1,8 +1,8 @@
+import { useState, useEffect, useRef } from 'react';
+import { vec4, mat4 } from '../myMath';
 
-var defaultShaderProgram;
-var defaultProgramInfo;
 
-function initBuffers(vertices, normals, colors, indices) {
+function initBuffers(gl,vertices, normals, colors, indices) {
     const verticesBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -40,7 +40,7 @@ function loadShader(gl, type, source) {
     }
     return shader;
 }
-function initDefaultShaderProgram(gl) {
+function initDefaultShaderProgram(gl, shaderCode) {
     const vsSource = `
     attribute vec4 aVertexPosition;
 
@@ -58,7 +58,7 @@ function initDefaultShaderProgram(gl) {
     `;
 
     const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
-    const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, generateShader3());
+    const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, shaderCode);
 
     // Create the shader program
     const shaderProgram = gl.createProgram();
@@ -93,221 +93,6 @@ function initDefaultShaderProgram(gl) {
 
     return [shaderProgram, programInfo]
 }
-
-
-
-const glCanvasElement = document.getElementById('glcanvas');
-const lightDistanceDivisorElement = document.getElementById('lightDistanceDivisor');
-const planeReflectanceElement = document.getElementById('planeReflectance');
-const sphereReflectanceElement = document.getElementById('sphereReflectance');
-const maxReflectionsElement = document.getElementById('maxReflections');
-const sphereDeformationFrequencyElement = document.getElementById('sphereDeformationFrequency');
-const sphereDeformationMultiplierElement = document.getElementById('sphereDeformationMultiplier');
-var gl;
-var camPos = new vec4(0,0,-5);
-var camRot = new vec4(Math.PI/2,0,0);
-var camRotMat = new mat4();
-var pressedKeys = {};
-var tick = 0;
-var mousePos = new vec4();
-var mouseIsDown = false;
-
-setup();
-
-const vertices = [-1,1,0, 1,1,0, 1,-1,0, -1,-1,0];
-const indices = [0,1,2, 0,2,3];
-const buffers = initBuffers(vertices, null, null, indices);
-
-var updateInterval = setInterval(update, 1000);
-document.addEventListener('keydown', keyPressed);
-document.addEventListener('keyup', keyReleased);
-glCanvasElement.addEventListener('mousedown', mouseDown);
-glCanvasElement.addEventListener('mousemove', mouseMove);
-document.addEventListener('mouseup', mouseUp);
-
-
-function setup() {
-    //var min = Math.min(window.visualViewport.width, window.visualViewport.height);
-    /*glCanvasElement.width = window.visualViewport.width;
-    glCanvasElement.height = window.visualViewport.height;
-    glCanvasElement.style.width = glCanvasElement.width + "px";
-    glCanvasElement.style.height = glCanvasElement.height + 'px';*/
-    //glCanvasElement.width = min;
-    //glCanvasElement.height = min;
-    //glCanvasElement.style.width = min + "px";
-    //glCanvasElement.style.height = min + 'px';
-    let bb = glCanvasElement.getBoundingClientRect();
-    glCanvasElement.width = bb.width;
-    glCanvasElement.height = bb.height;
-
-    gl = glCanvasElement.getContext("webgl");
-    if (gl === null) {
-        alert("Unable to initialize WebGL. Your browser or machine may not support it.");
-        return;
-    } else {
-        console.log("GL defined ")
-    }
-
-    //InitShader(gl);
-    [defaultShaderProgram, defaultProgramInfo] =  initDefaultShaderProgram(gl);
-}
-function keyPressed(event)
-{
-    var keyCode = event.key;
-    pressedKeys[keyCode.toLowerCase()] = true;
-    console.log(keyCode);
-    if (keyCode == "Enter")
-    {
-        setup();
-    }
-}
-function keyReleased(event)
-{
-    var keyCode = event.key;
-    pressedKeys[keyCode.toLowerCase()] = false;
-}
-function mouseDown(event)
-{
-    console.log(event);
-    mouseIsDown = true;
-    mousePos.x = event.clientX;
-    mousePos.y = event.clientY;
-}
-function mouseMove(event)
-{
-    if (mouseIsDown)
-    {
-        let x = event.clientX;
-        let y = event.clientY;
-        let dx = mousePos.x - x;
-        let dy = mousePos.y - y;
-        camRot.y += dx/500;
-        camRot.x += -dy/500;
-        mousePos.x = x;
-        mousePos.y = y;
-    }
-}
-function mouseUp(event)
-{
-    mouseIsDown = false;
-}
-
-function frameRate(element)
-{
-    let fr = Number(element.value);
-    clearInterval(updateInterval);
-    updateInterval = setInterval(update, Math.ceil(1000/fr));
-}
-
-
-function updateCamera() {
-    let tempTrans = new vec4();
-    let tempRot = new vec4();
-    let transSpeed = 0.1;
-    let rotSpeed = 0.05;
-    if (pressedKeys['w'])
-    {
-        tempTrans.z += transSpeed;// * Math.cos(camRot.y);
-    }
-    if (pressedKeys['s'])
-    {
-        tempTrans.z -= transSpeed;// * Math.cos(camRot.y);
-    }
-    if (pressedKeys['d'])
-    {
-        tempTrans.x += transSpeed;// * Math.cos(camRot.y);
-    }
-    if (pressedKeys['a'])
-    {
-        tempTrans.x -= transSpeed;// * Math.cos(camRot.y);
-    }
-    if (pressedKeys[' '])
-    {
-        tempTrans.y += transSpeed;
-    }
-    if (pressedKeys['shift'])
-    {
-        tempTrans.y -= transSpeed;
-    }
-
-
-    if (pressedKeys['arrowright'])
-    {
-        tempRot.y += rotSpeed;
-    }
-    if (pressedKeys['arrowleft'])
-    {
-        tempRot.y -= rotSpeed;
-    }
-    if (pressedKeys['arrowup'] && camRot.x < 2)
-    {
-        tempRot.x += rotSpeed;
-    }
-    if (pressedKeys['arrowdown'] && camRot.x > 1)
-    {
-        tempRot.x -= rotSpeed;
-    }
-
-    camRot.addi(tempRot);
-    //camRotMat.makeRotation(0, camRot.y, 0);
-    camPos.addi( new mat4().makeRotation(0,camRot.y,0).mul(tempTrans) );
-
-    //camRotMat.makeRotation(camRot.x*Math.sin(camRot.y), camRot.y, camRot.x * Math.cos(camRot.y))
-    //camRotMat =   new mat4().makeRotation(0,0,camRot.x).mul(  new mat4().makeRotation(0,camRot.y,0) ) ;
-    camRotMat =   new mat4().makeRotation(0,camRot.y, (-camRot.x + Math.PI/2)%Math.PI);
-
-    //camRotMat.makeRotation(camRot.x, camRot.y, camRot.z);
-}
-
-
-function update() {
-    tick += 1;
-
-    updateCamera();
-
-    camPos.addi(0,Math.sin(tick/10)/500)
-
-    gl.clearColor(0.01, 0.01, 0.01, 1);    // Clear to black, fully opaque
-    gl.clearDepth(1);                   // Clear everything
-    gl.enable(gl.DEPTH_TEST);           // Enable depth testing
-    gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
-    // Clear the canvas before we start drawing on it.
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-
-    var programInfo = defaultProgramInfo;
-
-    // Tell WebGL to use our program when drawing
-    gl.useProgram(programInfo.program);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertices);
-    gl.vertexAttribPointer(programInfo.attribLocations.vertexLocation, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(programInfo.attribLocations.vertexLocation);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
-
-    // Set the shader uniforms
-    lightDistanceDivisor = [Number(lightDistanceDivisorElement.value)];
-    planeReflectance = [Number(planeReflectanceElement.value)];
-    let sphereReflectance = [Number(sphereReflectanceElement.value)];
-    let sphereDeformationMultiplier = [Number(sphereDeformationMultiplierElement.value)];
-    let sphereDeformationFrequency = [Number(sphereDeformationFrequencyElement.value)];
-    gl.uniform4fv(programInfo.uniformLocations.viewPosition, camPos.getFloat32Array());
-    gl.uniform4fv(programInfo.uniformLocations.viewRotation, camRot.getFloat32Array());
-    gl.uniformMatrix4fv( programInfo.uniformLocations.rotationMatrix, false, camRotMat.getFloat32Array() );
-    gl.uniform1fv(programInfo.uniformLocations.lightDistanceDivisor, new Float32Array(lightDistanceDivisor));
-    gl.uniform1fv(programInfo.uniformLocations.planeReflectance, new Float32Array(planeReflectance));
-    gl.uniform1fv(programInfo.uniformLocations.sphereReflectance, new Float32Array(sphereReflectance));
-    gl.uniform1fv(programInfo.uniformLocations.sphereDeformationMultiplier, new Float32Array(sphereDeformationMultiplier));
-    gl.uniform1fv(programInfo.uniformLocations.sphereDeformationFrequency, new Float32Array(sphereDeformationFrequency));
-    let bb = glCanvasElement.getBoundingClientRect();
-    gl.uniform2fv(programInfo.uniformLocations.aspectRatio, new Float32Array([Number(3*bb.width/bb.height),0]));
-    
-    const vertexCount = indices.length;
-    gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
-}
-
-
-
-
 
 function generateShader3_OLD() {
     const defaultCode = `
@@ -632,9 +417,6 @@ function generateShader3_OLD() {
     return defaultCode;
 }
 
-///THIS IS THE ONE USED
-
-//
 function generateShader3() {
 
     //SPHERES
@@ -1001,6 +783,7 @@ function generateShader3() {
         rayD = ( uRotationMatrix * vec4(rayD.xyz,1.0) ).xyz;        
         vec3 rayP = uViewPosition.xyz;  //vec3(0.0, 0.0, 0.0);
         gl_FragColor = fireRay(rayD, rayP);
+        // gl_FragColor = vec4(1,0,0,1);
         gl_FragColor.a = 1.0;
     }
     `;
@@ -1009,9 +792,6 @@ function generateShader3() {
     console.log(combined);
     return combined;
 }
-
-
-
 
 
 
@@ -1653,225 +1433,312 @@ Cardboard dimensions: 19" x 5" (make it 6" tall)
 
 
 
+function WebGlRaytracing() {
+    const canvasRef = useRef(null);
+    const [defaultShaderProgram, setDefaultShaderProgram] = useState(null);
+    const [defaultProgramInfo, setDefaultProgramInfo] = useState(null);
+    const [gl, setGl] = useState(null);
+    const [globals, setGlobals] = useState({
+        mouseIsDown: false,
+        mousePos: new vec4(),
+        camPos: new vec4(0,0,-5),
+        camRot: new vec4(Math.PI/2,0,0),
+        camRotMat: new mat4(),
+        pressedKeys: {},
+        tick: 0,
+        vertices: [-100,100,0, 100,100,0, 100,-100,0, -100,-100,0],
+        indices: [0,1,2, 0,2,3],
+        buffers: null,
+    });
 
+    const [lightDistanceDivisor, setLightDistanceDivisor] = useState(9);
+    const [planeReflectance, setPlaneReflectance] = useState(0.8);
+    const [sphereReflectance, setSphereReflectance] = useState(0.2);
+    const [maxReflections, setMaxReflections] = useState(10);
+    const [sphereDeformationFrequency, setSphereDeformationFrequency] = useState(5);
+    const [sphereDeformationMultiplier, setSphereDeformationMultiplier] = useState(0.1);
+    const [frameRate, setFrameRate] = useState(2);
+    const [regenerate, setRegenerate] = useState(true);
+    const [shaderCode, setShaderCode] = useState("");
 
-
-
-/* OLD CODE:
-    const fsSourceHeader = `
-    precision highp float;
-    varying vec4 vScreenPos;
-
-    uniform vec4 uViewPosition;
-    uniform mat4 uRotationMatrix;
-    uniform float uLightDistanceDivisor;
-
-    `;
-    const toUnitFunction = `
-    vec3 unit(vec3 r)
-    {
-        float d = sqrt(r.x*r.x + r.y*r.y + r.z*r.z);
-        if (d < 0.0) { d = -d;}
-        r.x = r.x / d;
-        r.y = r.y / d;
-        r.z = r.z / d;
-        return r;
-    }
-    `;
-    const reflectRayFunction = `
-    vec3 reflectRay(vec3 rayD, vec3 N)
-    {
-        //float d = (rayD.x*N.x + rayD.y*N.y + rayD.z*N.z)*2.0;
-        float d = dot(rayD, N)*2.0;
-        return unit( rayD - N*d );
-    }
-    `;
-    const distToSphereFunction = `
-    float distToSphere(vec3 rayD, vec3 rayP, vec3 sC, float sR)
-    {
-        float a = rayD.x*rayD.x + rayD.y*rayD.y + rayD.z*rayD.z;
-        float b = 2.0 * (rayD.x * (rayP.x - sC.x) + rayD.y * (rayP.y - sC.y) + rayD.z * (rayP.z - sC.z));
-        float c = (rayP.x-sC.x)*(rayP.x-sC.x) + (rayP.y-sC.y)*(rayP.y-sC.y) + (rayP.z-sC.z)*(rayP.z-sC.z) - sR*sR;
-        float top = b*b - 4.0*a*c;
-
-        if (top >= 0.001)
-        {
-            top = sqrt(top);
-            float t1 = (-b-top)/(2.0*a);
-            float t2 = (-b+top)/(2.0*a);
-            if (t1 > 0.01 && (t1 < t2 || t2 < 0.01))
-            {
-                return t1;
-            } else if (t2 > 0.01 && (t2 < t1 || t1 < 0.01))
-            {
-                return t2;
-            }
+    useEffect(() => {
+        const glCanvasElement = canvasRef.current;
+        if (glCanvasElement === null) {
+            return;
         }
-        return 100000.0;
-    }
-    `;
-    const distToCubeFunction = `
-    float distToCube(vec3 rayD, vec3 rayP, vec3 bC, float bR)
-    {
-        float d = distToPlane(rayD, rayP, bC + vec3(0,0,bR), vec3(0,0,1));
-        if (d > 0.0 && d < 1000.0)
-        {
-            vec3 newRayP = rayP + rayD * d;
-            if (newRayP.x < bC.x + bR   &&  newRayP.x > bC.x - bR 
-                && newRayP.y < bC.y + bR   &&  newRayP.y > bC.y - bR)
-            {
-                return d;
-            }
+
+        function resize() {
+            let bb = glCanvasElement.getBoundingClientRect();
+            glCanvasElement.width = bb.width;
+            glCanvasElement.height = bb.height;
         }
-        return 10000.0;
-    }
-    `;
-    const distToPlaneFunction = `
-    float distToPlane(vec3 rayD, vec3 rayP, vec3 pP, vec3 pN)
-    {
-        float t = dot(pP-rayP, pN) / dot(rayD, pN);
-        if (t > 0.001)
-        {
-            return t;
-        }
-        return 10000.0;
-    }
-    `;
-    const distToPointFunction = `
-    float distToPoint(vec3 rayP, vec3 P)
-    {
-        vec3 x = P-rayP;
-        return sqrt( dot(x,x) );
-    }
-    `;
-    const mainFunction = `
-    void main() {
-        vec3 rayD = unit(vec3(vScreenPos.x*3.0, vScreenPos.y*3.0, 5.0));
-        rayD = ( uRotationMatrix * vec4(rayD.xyz,1.0) ).xyz;        
 
-        vec3 rayP = uViewPosition.xyz;  //vec3(0.0, 0.0, 0.0);
-    
-        gl_FragColor = fireRay(rayD, rayP);
-    }
-    `;
-    const fireRayFunction = `
-
-    vec4 fireRay(vec3 rayD, vec3 rayP)
-    {
-        vec4 color = vec4(0,0,0,1);
-        float percentDone = 0.0;
-
-        vec3 sC = vec3(0,0,4);
-        float sR = 1.0;
-
-        vec3 sC2 = vec3(1,2,5);
-        float sR2 = 0.6;
-
-        vec3 lC = vec3(4,0,8);
-
-        bool leavingSphere = false;
-        bool leavingSphere2 = false;
-
-        float sD = 10000.0;
-        float sD2 = 10000.0;
-        float pD1 = 10000.0;
-        float pD2 = 10000.0;
-        float pD3 = 10000.0;
-        float pD4 = 10000.0;
-        float pD5 = 10000.0;
-
-
-        for (int i=0; i<10; i++) {
-
-            if (!leavingSphere) { sD = distToSphere(rayD, rayP, sC, sR); } else { sD = 10000.0; }
-            //if (!leavingSphere) { sD = distToCube(rayD, rayP, sC, sR); } else { sD = 10000.0; }
-            if (!leavingSphere2) { sD2 = distToSphere(rayD, rayP, sC2, sR2); } else { sD2 = 10000.0; }
-            pD1 = distToPlane(rayD, rayP, vec3(0,  0,  10), vec3(0,0,1));
-            pD2 = distToPlane(rayD, rayP, vec3(5,  0,  0), vec3(1,0,0));
-            pD3 = distToPlane(rayD, rayP, vec3(-5, 0,  0), vec3(1,0,0));
-            //pD4 = distToPlane(rayD, rayP, vec3(0,  5,  0), vec3(0,1,0));
-            pD5 = distToPlane(rayD, rayP, vec3(0,  -5, 0), vec3(0,1,0));
-
-            float m = min(min(min(sD, pD1), min(pD2, pD3)), min(pD4, pD5));
-            m = min(m, sD2);
-
-
-            if (m == sD)
-            {
-                rayP = rayP + rayD*m;
-                rayD = reflectRay(unit(rayD), unit(sC-rayP));
-                //rayD = reflectRay(rayD, vec3(0,0,1));
-                
-                float d2 = distToSphere(rayD, rayP, sC, sR);
-                float d = distToPoint(rayP, lC);
-                if (d2 > d)
-                {
-                    //color += (1.0-percentDone)*0.0*vec4(1,1,1,0);
-                    //percentDone += (1.0-percentDone)*0.0;
-                }
-                leavingSphere = true;
-            } else if (m == sD2)
-            {
-                rayP = rayP + rayD*m;
-                rayD = reflectRay(rayD, unit(sC2-rayP) );
-
-                leavingSphere2 = true;
+        function setup() {
+            resize();
+            const newGl = glCanvasElement.getContext("webgl");
+            if (newGl === null) {
+                alert("Unable to initialize WebGL. Your browser or machine may not support it.");
+                return;
             } else {
-                leavingSphere = false;
-                leavingSphere2 = false;
-
-                vec3 newRayP = rayP + rayD*m;
-                vec3 newRayD = unit( lC - newRayP);
-                float d = distToPoint(newRayP, lC);
-                float d2 = distToSphere(newRayD, newRayP, sC, sR);
-                float d3 = distToSphere(newRayD, newRayP, sC2, sR2);
-                if ((d2 < d && d2 > 0.0) || (d3 < d && d3 > 0.0)){
-                    d = d*2.0;
-                }
-
-                d = d/uLightDistanceDivisor;
-
-                if (m == pD1)
-                {
-                    return vec4(1.0/d,0,0,1)*(1.0-percentDone) + percentDone*color;
-                }else if (m == pD2)
-                {
-                    return vec4(0,1.0/d,0,1)*(1.0-percentDone) + percentDone*color;
-                }else if (m == pD3)
-                {
-                    rayP = rayP + m*rayD;
-                    rayD = reflectRay(rayD, vec3(1,0,0));
-                    color += (1.0-percentDone)*0.9*vec4(0,1.0/d,1.0/d,0);
-                    percentDone += (1.0-percentDone)*0.9;
-                    //return vec4(0,0.5/d,0.5/d,1)*(1.0-percentDone) + percentDone*color;
-                }else if (m == pD4)
-                {
-                    return vec4(0.5/d,0.5/d,0,1)*(1.0-percentDone) + percentDone*color;
-                }else if (m == pD5)
-                {
-                    rayP = rayP + m*rayD;
-                    rayD = reflectRay(rayD, vec3(0,1,0));
-                    color += (1.0-percentDone)*0.99*vec4(1.0/d,1.0/d,1.0/d,0);
-                    percentDone += (1.0-percentDone)*0.99;
-                    //return vec4(1.0/d,1.0/d,1.0/d,1)*(1.0-percentDone) + percentDone*color;
-                }
+                console.log("GL defined ")
             }
 
+            resize();
+            window.addEventListener('resize', resize);
 
-            if (percentDone > 0.95)
-            {
-                return color;
-            }
-            
+            // InitShader(gl);
+            const newShaderCode = generateShader3();
+            const [sp, pi] =  initDefaultShaderProgram(newGl, newShaderCode);
+            setDefaultShaderProgram(sp);
+            setDefaultProgramInfo(pi);
+            setGl(newGl);
+            setShaderCode(newShaderCode);
+            globals.buffers = initBuffers(newGl, globals.vertices, null, null, globals.indices);
+            return;
         }
 
-        //Return white if there's an issue and nothing is hit.
-        return vec4(1,1,1,1);
-    }
-    `;
 
-    //let fireRayFunction2 = generateShader();
+        // Initialize WebGL only once
+        if (defaultShaderProgram === null || regenerate) {
+            setup();
+            setRegenerate(false);
+            return;
+        }
 
-    const fsSource  =  fsSourceHeader + toUnitFunction + reflectRayFunction + distToPlaneFunction + distToCubeFunction + distToPointFunction + distToSphereFunction +
-    fireRayFunction + mainFunction;
-*/
+
+
+        function keyPressed(event)
+        {
+            const keyCode = event.key;
+            globals.pressedKeys[keyCode.toLowerCase()] = true;
+            console.log(keyCode);
+            if (keyCode == "Enter")
+            {
+                setup();
+            }
+        }
+        function keyReleased(event)
+        {
+            const keyCode = event.key;
+            globals.pressedKeys[keyCode.toLowerCase()] = false;
+        }
+        function mouseDown(event)
+        {
+            console.log(event);
+            globals.mouseIsDown = true;
+            globals.mousePos.x = event.clientX;
+            globals.mousePos.y = event.clientY;
+        }
+        function mouseMove(event)
+        {
+            if (globals.mouseIsDown)
+            {
+                let x = event.clientX;
+                let y = event.clientY;
+                let dx = globals.mousePos.x - x;
+                let dy = globals.mousePos.y - y;
+                globals.camRot.y += dx/500;
+                globals.camRot.x += -dy/500;
+                globals.mousePos.x = x;
+                globals.mousePos.y = y;
+            }
+        }
+        function mouseUp(event)
+        {
+            globals.mouseIsDown = false;
+        }
+
+
+        function updateCamera() {
+            let tempTrans = new vec4();
+            let tempRot = new vec4();
+            let transSpeed = 0.1;
+            let rotSpeed = 0.05;
+            if (globals.pressedKeys['w'])
+            {
+                tempTrans.z += transSpeed;// * Math.cos(camRot.y);
+            }
+            if (globals.pressedKeys['s'])
+            {
+                tempTrans.z -= transSpeed;// * Math.cos(camRot.y);
+            }
+            if (globals.pressedKeys['d'])
+            {
+                tempTrans.x += transSpeed;// * Math.cos(camRot.y);
+            }
+            if (globals.pressedKeys['a'])
+            {
+                tempTrans.x -= transSpeed;// * Math.cos(camRot.y);
+            }
+            if (globals.pressedKeys[' '])
+            {
+                tempTrans.y += transSpeed;
+            }
+            if (globals.pressedKeys['shift'])
+            {
+                tempTrans.y -= transSpeed;
+            }
+
+
+            if (globals.pressedKeys['arrowright'])
+            {
+                globals.camRot.y += rotSpeed;
+            }
+            if (globals.pressedKeys['arrowleft'])
+            {
+                globals.camRot.y -= rotSpeed;
+            }
+            if (globals.pressedKeys['arrowup'] && globals.camRot.x < 2)
+            {
+                globals.camRot.x += rotSpeed;
+            }
+            if (globals.pressedKeys['arrowdown'] && globals.camRot.x > 1)
+            {
+                globals.camRot.x -= rotSpeed;
+            }
+
+            globals.camRot.addi(tempRot);
+            globals.camRot.x += 0.001 * Math.cos(Date.now()/2000);
+            globals.camRot.y += 0.001 * Math.cos(Date.now()/1666);
+            //camRotMat.makeRotation(0, camRot.y, 0);
+            globals.camPos.addi( new mat4().makeRotation(0,globals.camRot.y,0).mul(tempTrans) );
+
+            //camRotMat.makeRotation(camRot.x*Math.sin(camRot.y), camRot.y, camRot.x * Math.cos(camRot.y))
+            //camRotMat =   new mat4().makeRotation(0,0,camRot.x).mul(  new mat4().makeRotation(0,camRot.y,0) ) ;
+            globals.camRotMat =   new mat4().makeRotation(0,globals.camRot.y, (-globals.camRot.x + Math.PI/2)%Math.PI);
+
+            //camRotMat.makeRotation(camRot.x, camRot.y, camRot.z);
+        }
+
+
+        function update() {
+            console.log("update");
+            globals.tick += 1;
+
+            updateCamera();
+
+            globals.camPos.addi(0,Math.sin(globals.tick/10)/500)
+
+            gl.clearColor(0.01, 0.01, 0.01, 1);    // Clear to black, fully opaque
+            gl.clearDepth(1);                   // Clear everything
+            gl.enable(gl.DEPTH_TEST);           // Enable depth testing
+            gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
+            // Clear the canvas before we start drawing on it.
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            // gl.clear(gl.COLOR_BUFFER_BIT);
+
+
+            const programInfo = defaultProgramInfo;
+
+            // Tell WebGL to use our program when drawing
+            gl.useProgram(programInfo.program);
+            gl.bindBuffer(gl.ARRAY_BUFFER, globals.buffers.vertices);
+            gl.vertexAttribPointer(programInfo.attribLocations.vertexLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(programInfo.attribLocations.vertexLocation);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, globals.buffers.indices);
+
+            // Set the shader uniforms
+            gl.uniform4fv(programInfo.uniformLocations.viewPosition, globals.camPos.getFloat32Array());
+            gl.uniform4fv(programInfo.uniformLocations.viewRotation, globals.camRot.getFloat32Array());
+            gl.uniformMatrix4fv( programInfo.uniformLocations.rotationMatrix, false, globals.camRotMat.getFloat32Array() );
+            gl.uniform1fv(programInfo.uniformLocations.lightDistanceDivisor, new Float32Array([lightDistanceDivisor]));
+            gl.uniform1fv(programInfo.uniformLocations.planeReflectance, new Float32Array([planeReflectance]));
+            gl.uniform1fv(programInfo.uniformLocations.sphereReflectance, new Float32Array([sphereReflectance]));
+            gl.uniform1fv(programInfo.uniformLocations.sphereDeformationMultiplier, new Float32Array([sphereDeformationMultiplier]));
+            gl.uniform1fv(programInfo.uniformLocations.sphereDeformationFrequency, new Float32Array([sphereDeformationFrequency]));
+            let bb = glCanvasElement.getBoundingClientRect();
+            gl.uniform2fv(programInfo.uniformLocations.aspectRatio, new Float32Array([Number(3*bb.width/bb.height),0]));
+            
+            const vertexCount = globals.indices.length;
+            gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
+        }
+
+
+
+
+        // Add event listeners
+        document.addEventListener('keydown', keyPressed);
+        document.addEventListener('keyup', keyReleased);
+        glCanvasElement.addEventListener('mousedown', mouseDown);
+        glCanvasElement.addEventListener('mousemove', mouseMove);
+        document.addEventListener('mouseup', mouseUp);
+        const updateInterval = setInterval(update, 1000/frameRate);
+
+        return () => {
+            window.removeEventListener('resize', resize);
+            document.removeEventListener('keydown', keyPressed);
+            document.removeEventListener('keyup', keyReleased);
+            glCanvasElement.removeEventListener('mousedown', mouseDown);
+            glCanvasElement.removeEventListener('mousemove', mouseMove);
+            document.removeEventListener('mouseup', mouseUp);
+            clearInterval(updateInterval);
+        }
+    }, [canvasRef, defaultShaderProgram, defaultProgramInfo, gl, globals, lightDistanceDivisor, planeReflectance, sphereReflectance, maxReflections, sphereDeformationFrequency, sphereDeformationMultiplier, frameRate, regenerate]);
+
+    return (
+        <div className="project-container">
+            <div style={{'display': 'flex', 'width': '100%', 'justifyContent': 'center'}}>
+                <h1>
+                    WebGL Raytracing
+                </h1>
+            </div>
+
+            <div style={{'opacity': 0.8, 'backgroundColor': 'rgba(100,100,100,0.5)', 'padding': '1%', 'fontSize': 'x-small', 'width': 'fit-content', 'position': 'absolute', 'zIndex': 200}}>
+                Frame Rate: <input id='frameRate' type='range' min={1} max={30} value={frameRate} step={1} onChange={(e)=>setFrameRate(e.target.value)} /> {frameRate}
+                <br />
+                Light Distance Divisor: <input id='lightDistanceDivisor' type='range' min={0} max={10} value={lightDistanceDivisor} step={0.1} onChange={(e)=>setLightDistanceDivisor(e.target.value)} />
+                <br />
+                Plane Reflectance: <input id='planeReflectance' type='range' min={0.1} max={0.99} value={planeReflectance} step={0.01} onChange={(e)=>setPlaneReflectance(e.target.value)} />
+                <br />
+                Sphere Reflectance: <input id='sphereReflectance' type='range' min={0.1} max={0.99} value={sphereReflectance} step={0.01} onChange={(e)=>setSphereReflectance(e.target.value)} />
+                <br />
+                Sphere Deformation Multiplier: <input id='sphereDeformationMultiplier' type='range' min={0} max={0.99} value={sphereDeformationMultiplier} step={0.01} onChange={(e)=>setSphereDeformationMultiplier(e.target.value)} />
+                <br />
+                Sphere Deformation Frequency: <input id='sphereDeformationFrequency' type='range' min={1} max={200} value={sphereDeformationFrequency} step={0.1} onChange={(e)=>setSphereDeformationFrequency(e.target.value)} />
+                <br />
+                <button style={{margin:'0.5rem', border:'none', backgroundColor:'#000', color:'#fff', padding:'0.2rem', borderRadius:'0.2rem'}} onClick={()=>setRegenerate(true)}>Regenerate Shader</button>
+                <div style={{'fontStyle': 'italic', 'fontSize': 'inherit'}}>
+                    Use WASD to move camera origin 
+                    <br />
+                    Drag mouse or use the arrow keys to rotate
+                    <br />
+                    Press Enter to regenerate random scene
+                </div>
+            </div>
+            <canvas ref={canvasRef} style={{'position': 'relative', 'display': 'block', 'width': '100%', 'height': '100%', 'zIndex': 100}}></canvas>
+
+            <div style={{'display': 'flex', 'width': '100%', 'justifyContent': 'center'}}>
+                <div style={{'width': '80vw', 'marginBottom': '5vmin', 'marginTop': '5vmin'}}>
+                    1. This is an experimental raytracing engine I built, where I procedurally generate the GPU fragment shader
+                    code. This allows for different scenes to be created quite easily!
+                    <br /><br />
+                    2. Running this program can requires significant GPU usage, so I advise reducing the frame rate (via the first slider) if you are experiencing gittering.
+                    <br /><br />
+                    3. Currently, every surface is perfectly smooth meaning there exists only one output ray for each ray-object intersection.
+                    <br /><br />
+                    4. This renderer can raytrace planes, spheres, and triangles.
+                </div>
+            </div>
+
+            <div style={{'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center', 'width': '100%', 'marginTop': '20px', 'paddingBottom': '30rem'}}>
+                <h3 style={{'marginBottom': '10px'}}>Fragment Shader Code</h3>
+                <textarea 
+                    value={shaderCode}
+                    readOnly
+                    style={{
+                        'width': '80%',
+                        'height': '80vh',
+                        'fontFamily': 'monospace',
+                        'fontSize': '12px',
+                        'padding': '10px',
+                        'backgroundColor': '#f5f5f5',
+                        'border': '1px solid #ccc',
+                        'borderRadius': '4px'
+                    }}
+                />
+            </div>
+        </div>
+    )
+}
+
+export default WebGlRaytracing;

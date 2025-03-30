@@ -6,6 +6,18 @@ import { useState, useEffect, useRef } from "react";
 import { EasyGL } from "../easyGL";
 import { vec4, mat4, getRotationFromRotationMatrix, distanceBetweenPoints } from "../myMath";
 
+const backgroundColor = new vec4(135/255, 206/255, 235/255,1);
+const chunkSize = 20;
+const selectedStepDist = 0.05;
+const selectDistance = 6;
+var cloneGlobals = {
+    easyGl: null,
+    canvasElement: null,
+    player: null,
+    chunkManager: null,
+    entities: [],
+}
+
 class FPC2 {
     constructor(position = new vec4(), rotation = new vec4())
     {
@@ -34,169 +46,6 @@ class FPC2 {
         this.viewMatNeedsUpdate = true;
         this.pUpdateTime = new Date().getTime();
     }
-
-    update_OLD() {
-        const currentTime = new Date().getTime();
-        const dTime = (currentTime - this.pUpdateTime)/1000;
-        this.pUpdateTime = currentTime;
-        let mspeed = this.movementSpeed * dTime * (this.isFalling ? 0.2 : 1); //half speed if falling/is in air
-        const rspeed = this.rotationSpeed * dTime;
-        const jspeed = (this.isFlying) ?  mspeed*2 : this.jumpSpeed * dTime;
-        const fspeed = this.fallSpeed * dTime;
-
-        let posChange = new vec4();
-
-
-        const bb = 0.4;
-        const feetYOffset = -1.1;
-        const headYOffset = -0.1;
-        const belowFeetYOffset = -1.9;
-        const aboveHeadYOffset = 0.5;
-        const pos = this.getPosition().muli(1,1,1);
-        const belowFeet = chunkManager.getBlock(pos.add(0,belowFeetYOffset));
-        const feet = chunkManager.getBlock(pos.add(0,feetYOffset));
-        const head = chunkManager.getBlock(pos);
-        const aboveHead = chunkManager.getBlock(pos.add(0,aboveHeadYOffset));
-
-        //used below keyboard input.
-        const feetXp = chunkManager.getBlock(pos.add(bb, feetYOffset, 0));
-        const feetXm = chunkManager.getBlock(pos.add(-bb, feetYOffset, 0));
-        const feetZp = chunkManager.getBlock(pos.add(0, feetYOffset, bb));
-        const feetZm = chunkManager.getBlock(pos.add(0, feetYOffset, -bb));
-        const headXp = chunkManager.getBlock(pos.add(bb, headYOffset, 0));
-        const headXm = chunkManager.getBlock(pos.add(-bb, headYOffset, 0));
-        const headZp = chunkManager.getBlock(pos.add(0, headYOffset, bb));
-        const headZm = chunkManager.getBlock(pos.add(0, headYOffset, -bb));
-
-        if (belowFeet == null && pos.y > 1) // falling = true
-        {
-            this.isFalling = true;
-            this.posChange += fspeed;
-        }
-
-
-        //Keyboard input
-        if (this.pressedKeys.get('shift') == true)
-        {
-            if (this.isFlying)
-            {
-                posChange.y -= mspeed;
-            } else {
-                this.viewMatNeedsUpdate = true;
-                mspeed *= 1.5
-            }
-        }
-        if (this.pressedKeys.get('w') == true)
-        {
-            this.viewMatNeedsUpdate = true;
-            posChange.x += Math.sin(this.rotation.y)*mspeed; 
-            posChange.z += Math.cos(this.rotation.y)*mspeed;
-        }
-        if (this.pressedKeys.get('s') == true)
-        {
-            this.viewMatNeedsUpdate = true;
-            posChange.x -= Math.sin(this.rotation.y)*mspeed; 
-            posChange.z -= Math.cos(this.rotation.y)*mspeed;
-        }
-        if (this.pressedKeys.get('a') == true)
-        {
-            this.viewMatNeedsUpdate = true;
-            posChange.x -= Math.cos(this.rotation.y)*mspeed; 
-            posChange.z += Math.sin(this.rotation.y)*mspeed;
-        }
-        if (this.pressedKeys.get('d') == true)
-        {
-            this.viewMatNeedsUpdate = true;
-            posChange.x += Math.cos(this.rotation.y)*mspeed; 
-            posChange.z -= Math.sin(this.rotation.y)*mspeed;
-        }
-        if (this.pressedKeys.get(' ') == true && (this.isFalling == false || this.isFlying))
-        {
-            this.viewMatNeedsUpdate = true;
-            posChange.y += jspeed;
-        }
-
-        //rotation input
-        if (this.pressedKeys.get('arrowright') == true)
-        {
-            this.viewMatNeedsUpdate = true;
-            this.rotation.y += rspeed;
-        }
-        if (this.pressedKeys.get('arrowleft') == true)
-        {
-            this.viewMatNeedsUpdate = true;
-            this.rotation.y -= rspeed;
-        }
-        if (this.pressedKeys.get('arrowup') == true)
-        {
-            this.viewMatNeedsUpdate = true;
-            this.rotation.z -= rspeed;
-        }
-        if (this.pressedKeys.get('arrowdown') == true)
-        {
-            this.viewMatNeedsUpdate = true;
-            this.rotation.z += rspeed;
-        }
-
-
-
-        /*
-        //determine if falling or not, and adjust velocity.
-        if (belowFeet != null) // falling = true
-        {
-            //posChange.y = 0;
-            this.velocity.y = 0;
-            this.isFalling = false;
-            this.position.y = Math.round(this.position.y +  belowFeetYOffset) + 0.49 - belowFeetYOffset;
-        }
-
-        //only allow movement along x axis if no block is going to be hit.
-        if ((feetXp != null && feetXp != null && posChange.x > 0) || 
-            (headXp != null && headXp != null && posChange.x > 0) )
-        {
-            posChange.x = 0;
-            this.velocity.x = 0;
-        }
-        if ((feetXm != null && feetXm != null && posChange.x < 0) ||
-            (headXm != null && headXm != null && posChange.x < 0) )
-        {
-            posChange.x = 0;
-            this.velocity.x = 0;
-        }
-        if ((feetZm != null && feetZm != null && posChange.z > 0) ||
-            (headZm != null && headZm != null && posChange.z > 0) )
-        {
-            posChange.z = 0;
-            this.velocity.z = 0;
-        } 
-        if ((feetZp != null && feetZp != null && posChange.z < 0) || 
-        (headZp != null && headZp != null && posChange.z < 0) )
-        {
-            posChange.z = 0;
-            this.velocity.z = 0;
-        }
-
-        if (aboveHead != null && (this.velocity.y > 0 || posChange.y > 0))
-        {
-            posChange.y = 0;
-            this.velocity.y = 0;
-            //console.log("y: "+this.position.y +"  new y: " + (Math.round(this.position.y +  aboveHeadYOffset) - 0.49 - aboveHeadYOffset));
-            this.position.y = Math.round(this.position.y +  aboveHeadYOffset) - 0.49 - aboveHeadYOffset;
-        }
-        //console.log(aboveHead, posChange.y);
-        this.velocity.addi(posChange);
-        this.position.addi(this.velocity);
-
-        if (this.isFalling && !this.isFlying)
-        {
-            this.velocity.muli(0.9, 0.9, 0.9);
-        } else if (!this.isFlying) {
-            this.velocity.muli(0.2, 0.9, 0.2);
-        } else {
-            this.velocity.muli(0.9, 0.9, 0.9);
-        }*/
-
-    }
     update() {
         const currentTime = new Date().getTime();
         const dTime = (currentTime - this.pUpdateTime)/1000;
@@ -215,7 +64,7 @@ class FPC2 {
         const aboveHeadYOffset = 0.5;
         const pos = this.getPosition().muli(1,1,1);
 
-        let belowFeet = chunkManager.getBlock(pos.add(0,belowFeetYOffset));
+        let belowFeet = cloneGlobals.chunkManager.getBlock(pos.add(0,belowFeetYOffset));
 
         if (belowFeet == null && pos.y > 1) // falling = true
         {
@@ -290,7 +139,7 @@ class FPC2 {
             this.rotation.z += rspeed;
         }
 
-        belowFeet = chunkManager.getBlock(pos.add(0,belowFeetYOffset));
+        belowFeet = cloneGlobals.chunkManager.getBlock(pos.add(0,belowFeetYOffset));
         //let feet = chunkManager.getBlock(pos.add(0,feetYOffset));
         //let head = chunkManager.getBlock(pos);
         //let aboveHead = chunkManager.getBlock(pos.add(0,aboveHeadYOffset));
@@ -328,10 +177,10 @@ class FPC2 {
         const nextPos = pos.add(dPos.x*1.2, 0, dPos.z*1.2);
         const nextFeet = nextPos.add(0,feetYOffset,0);
         const nextHead = nextPos.add(0,headYOffset,0);
-        let block = chunkManager.getBlock(nextFeet);
+        let block = cloneGlobals.chunkManager.getBlock(nextFeet);
         if (block == null)
         {
-            block = chunkManager.getBlock(nextHead);
+            block = cloneGlobals.chunkManager.getBlock(nextHead);
         }
         //let nextXp = pos.add();
         //const rPos = 
@@ -498,19 +347,23 @@ class FPC2 {
     }
     eventListener(event)
     {
+        console.log(event);
         switch (event.type)
         {
             case 'keydown': this.pressedKeys.set(event.key.toLowerCase(), true); break;
             case 'keyup': this.pressedKeys.set(event.key.toLowerCase(), false); break;
             case 'mousedown': this.mouseIsDown = true; break;
             case 'mouseup': this.mouseIsDown = false; break;
-            case 'mousemove': 
+            case 'mousemove':
                 if (this.mouseIsDown)
                 {
                     this.viewMatNeedsUpdate = true;
                     this.rotation.y -= event.movementX*this.mouseSensitivityMultiplier/1000;
                     this.rotation.z -= event.movementY*this.mouseSensitivityMultiplier/1000;
                 }
+                break;
+            default:
+                console.error("FPC.eventListener(). Unhandled event type: " + event.type);
                 break;
         }
     }
@@ -701,9 +554,9 @@ class Player {
     }
     _getInventoryUIIndexFromMouseEvent(event)
     {
-        let aspectRatio = canvasElement.width/canvasElement.height;
-        let mx = ((event.offsetX*2)/canvasElement.width - 1)*aspectRatio;   //mouseX and mouseY, scale X using aspect ratio
-        let my = 1 - (event.offsetY*2)/canvasElement.height;
+        let aspectRatio = cloneGlobals.canvasElement.width/cloneGlobals.canvasElement.height;
+        let mx = ((event.offsetX*2)/cloneGlobals.canvasElement.width - 1)*aspectRatio;   //mouseX and mouseY, scale X using aspect ratio
+        let my = 1 - (event.offsetY*2)/cloneGlobals.canvasElement.height;
         
         let dy = this.inventoryRowHeight/2;     //half of row height
         let dx = this.inventoryColumnWidth/2;   //half of row width
@@ -1030,7 +883,7 @@ class Player {
             {
                 pPos = pos.copy();
                 pos.addi(stepVec);
-                const ret = chunkManager.getBlock(pos);
+                const ret = cloneGlobals.chunkManager.getBlock(pos);
                 if (ret != null)
                 {
                     //console.log("mousedown || mousemove: found block.");
@@ -1041,32 +894,35 @@ class Player {
                 }
             }
         }
+
+        console.log(event, faceBlockPos);
         if (event.type == "mousedown" && event.which == 1)//left click, start mining.
         {
-            mouseIsDown = true;
+            cloneGlobals.mouseIsDown = true;
             if (blockType != null)
             {
                 //console.log("Start mining @ " + blockPos.toString(.1))
-                blockMiningStartTime = Date.now(); 
-                blockMiningPos = blockPos;
-                blockMiningType = blockType;
+                cloneGlobals.blockMiningStartTime = Date.now(); 
+                cloneGlobals.blockMiningPos = blockPos;
+                cloneGlobals.blockMiningType = blockType;
             }
         }
         if (event.type == "mousedown" && event.which == 3 && faceBlockPos != null)//right click down - start placing..
         {
-            blockMiningType = null;
-            blockMiningPos = null;
+            cloneGlobals.blockMiningType = null;
+            cloneGlobals.blockMiningPos = null;
             this.blockStartPlacingPos = faceBlockPos.copy();
         }
         if (event.type == "mouseup" && event.which == 3 && faceBlockPos != null)//right click up - place blocks
         {
-            blockMiningType = null;
-            blockMiningPos = null;
+            cloneGlobals.blockMiningType = null;
+            cloneGlobals.blockMiningPos = null;
+            this.blockStartPlacingPos = faceBlockPos.copy();
 
             if (this.blockStartPlacingPos.equals(faceBlockPos))
             {
-                const blockType = player.removeItem();
-                chunkManager.setBlock(faceBlockPos, blockType);
+                const blockType = this.removeItem();
+                cloneGlobals.chunkManager.setBlock(faceBlockPos, blockType);
             } else {
                 const vec = faceBlockPos.sub(this.blockStartPlacingPos);
                 const dist = vec.getLength();
@@ -1088,7 +944,7 @@ class Player {
                             break;
                         }
                         positions.push(pos);
-                        let b = chunkManager.getBlock(pos);
+                        let b = cloneGlobals.chunkManager.getBlock(pos);
 
                         if (isNaN(b) || b < 0)
                         {
@@ -1101,30 +957,30 @@ class Player {
                     pos.addi(step)
                 }
                 this.removeItem(this.inventorySelectIndex, numBlocksPlaced);
-                chunkManager.setBlock(positions, type);
+                cloneGlobals.chunkManager.setBlock(positions, type);
             }
 
         }
         if (event.type == "mouseup") //stop mining...
         {
-            mouseIsDown = false;
-            blockMiningPos = null;
-            blockMiningType = null;
+            cloneGlobals.mouseIsDown = false;
+            cloneGlobals.blockMiningPos = null;
+            cloneGlobals.blockMiningType = null;
         }
         if (event.type == "mousemove" || event.type == "custommousemove") 
         {
-            if (blockMiningPos != null)
+            if (cloneGlobals.blockMiningPos != null)
             {
-                if (blockPos == null || !(blockMiningPos.x == blockPos.x && blockMiningPos.y == blockPos.y && blockMiningPos.z == blockPos.z))
+                if (blockPos == null || !(cloneGlobals.blockMiningPos.x == blockPos.x && cloneGlobals.blockMiningPos.y == blockPos.y && cloneGlobals.blockMiningPos.z == blockPos.z))
                 {
                     //if mose moved and currently-looking-at block is different, stop mining
-                    blockMiningPos = null;
-                    blockMiningType = null;
-                    if (blockPos != null && mouseIsDown == true)
+                    cloneGlobals.blockMiningPos = null;
+                    cloneGlobals.blockMiningType = null;
+                    if (blockPos != null && cloneGlobals.mouseIsDown == true)
                     {
-                        blockMiningStartTime = Date.now(); 
-                        blockMiningPos = blockPos;
-                        blockMiningType = blockType;
+                        cloneGlobals.blockMiningStartTime = Date.now(); 
+                        cloneGlobals.blockMiningPos = blockPos;
+                        cloneGlobals.blockMiningType = blockType;
                     }
                 }
             }
@@ -1136,7 +992,7 @@ class Player {
     }
     render()
     {
-        const scaleMatrix = new mat4().makeScale(canvasElement.height/canvasElement.width,1,1);
+        const scaleMatrix = new mat4().makeScale(cloneGlobals.canvasElement.height/cloneGlobals.canvasElement.width,1,1);
         const identityMatrix = new mat4().makeIdentity();
         
         for (let i=0; i< ((this.inMenu)? this.inventory.length: 10 ); i++)
@@ -1411,7 +1267,7 @@ class Chunk
                     e.velocity.x = 3 - Math.random()*6;
                     e.velocity.y = 3 - Math.random()*6;
                     e.velocity.z = 3 - Math.random()*6;
-                    entities.push( e );
+                    cloneGlobals.entities.push( e );
                 } else {
                     console.error("spawn new thingy: " + drop);
                     e = this.spawnEntityByName(drop, new vec4(pos.x+this.position.x, pos.y + this.position.y, pos.z + this.position.z));
@@ -1925,7 +1781,7 @@ class FloatingBlock extends Entity
         this.velocity.y *= 0.9;
 
 
-        const fpcPos = player.fpc.getPosition().mul(1,1,1).subi(0,0.75,0);
+        const fpcPos = cloneGlobals.player.fpc.getPosition().mul(1,1,1).subi(0,0.75,0);
         const distToFpc = distanceBetweenPoints(fpcPos, this.position); 
         if (distToFpc < this.floatDist)
         {
@@ -1933,7 +1789,7 @@ class FloatingBlock extends Entity
             if (distToFpc < 1)
             {
                 this.easyGl.deleteObject(this.id);
-                player.collectItem(this.blockType, this.quantity);
+                cloneGlobals.player.collectItem(this.blockType, this.quantity);
                 this.isDead = true;
                 return;
             }
@@ -1941,11 +1797,11 @@ class FloatingBlock extends Entity
 
         //Add falling
         const bb = 0.2;
-        const blockBelow = chunkManager.getBlock(this.position.add(0,-0.5,0));
-        const blockLeft = chunkManager.getBlock(this.position.add(bb,0.1,0));
-        const blockRight = chunkManager.getBlock(this.position.add(-bb,-0.1,0));
-        const blockFront = chunkManager.getBlock(this.position.add(0,-0.1,bb));
-        const blockBack = chunkManager.getBlock(this.position.add(0,-.1,-bb));
+        const blockBelow = cloneGlobals.chunkManager.getBlock(this.position.add(0,-0.5,0));
+        const blockLeft = cloneGlobals.chunkManager.getBlock(this.position.add(bb,0.1,0));
+        const blockRight = cloneGlobals.chunkManager.getBlock(this.position.add(-bb,-0.1,0));
+        const blockFront = cloneGlobals.chunkManager.getBlock(this.position.add(0,-0.1,bb));
+        const blockBack = cloneGlobals.chunkManager.getBlock(this.position.add(0,-.1,-bb));
         if (blockBelow == null)
         {
             this.velocity.y -= 0.2;
@@ -1991,11 +1847,11 @@ class FallingBlock extends Entity
         //Add falling
         //Add falling
         const bb = 0.2;
-        const blockBelow = chunkManager.getBlock(this.position.add(0,-0.5,0));
-        const blockLeft = chunkManager.getBlock(this.position.add(bb,0.1,0));
-        const blockRight = chunkManager.getBlock(this.position.add(-bb,-0.1,0));
-        const blockFront = chunkManager.getBlock(this.position.add(0,-0.1,bb));
-        const blockBack = chunkManager.getBlock(this.position.add(0,-.1,-bb));
+        const blockBelow = cloneGlobals.chunkManager.getBlock(this.position.add(0,-0.5,0));
+        const blockLeft = cloneGlobals.chunkManager.getBlock(this.position.add(bb,0.1,0));
+        const blockRight = cloneGlobals.chunkManager.getBlock(this.position.add(-bb,-0.1,0));
+        const blockFront = cloneGlobals.chunkManager.getBlock(this.position.add(0,-0.1,bb));
+        const blockBack = cloneGlobals.chunkManager.getBlock(this.position.add(0,-.1,-bb));
         if (blockBelow == null)
         {
             this.velocity.y -= 0.2;
@@ -2048,7 +1904,7 @@ class TNT extends FallingBlock
 
         const dt = (Date.now() - this.start)/1000;
         this.color.a = Math.sin(2*dt)/3 + 0.5;
-        easyGl.setObjectColor(this.id, this.color); //this.color.x, this.color.y, this.color.z, Math.sin(dt)/3 + 0.5 );
+        this.easyGl.setObjectColor(this.id, this.color); //this.color.x, this.color.y, this.color.z, Math.sin(dt)/3 + 0.5 );
 
         if (dt > this.maxTime)
         {
@@ -2069,25 +1925,25 @@ class TNT extends FallingBlock
                 }
             }
             
-            chunkManager.breakBlock(positions, false, this.probabilityOfDrop);
+            cloneGlobals.chunkManager.breakBlock(positions, false, this.probabilityOfDrop);
 
             const dist = 6;
-            for (let i=0; i<entities.length; i++)
+            for (let i=0; i<cloneGlobals.entities.length; i++)
             {
-                if (entities[i] == this) { continue; }
-                const vec = entities[i].position.sub(this.position);
+                if (cloneGlobals.entities[i] == this) { continue; }
+                const vec = cloneGlobals.entities[i].position.sub(this.position);
                 const d = vec.getLength();
                 vec.muli(1/d);
                 if (d < dist)
                 {
-                    entities[i].velocity.addi( vec.mul(dist-d) );
+                    cloneGlobals.entities[i].velocity.addi( vec.mul(dist-d) );
                 }
             }
 
-            const vec = player.fpc.position.sub(this.position);
+            const vec = cloneGlobals.player.fpc.position.sub(this.position);
             const d = vec.getLength();
-            player.fpc.velocity.y += 1/d * 3;
-            player.fpc.isFalling = true;
+            cloneGlobals.player.fpc.velocity.y += 1/d * 3;
+            cloneGlobals.player.fpc.isFalling = true;
 
             this.easyGl.deleteObject(this.id);
             this.isDead = true;
@@ -2237,12 +2093,6 @@ function Clone()
     const [scaleMatrix, setScaleMatrix] = useState(null);
     const [identityMatrix, setIdentityMatrix] = useState(null);
 
-
-    const backgroundColor = new vec4(0.3,0,0.3,1);
-    const chunkSize = 20;
-    const selectedStepDist = 0.05;
-    const selectDistance = 6;
-
     const [data, setData] = useState({
         mouseIsDown: false,
         blockMiningPos: null,
@@ -2253,6 +2103,33 @@ function Clone()
 
 
     useEffect(() => {
+
+        // Don't even bother if easyGl is not initialized
+        if (easyGl == null) { return; }
+        cloneGlobals.easyGl = easyGl;
+        cloneGlobals.canvasElement = canvasRef.current;
+
+        // Handle creation of player, chunkManager, and entities
+        if (player == null) {
+            sliderInput(); //set FOV, zNear, and zFar to slider defaults
+            const newPlayer = new Player(new vec4(1,75,1), new vec4(0,0,0), easyGl);
+            cloneGlobals.player = newPlayer;
+            const newChunkManager = new ChunkManager(easyGl, chunkSize);
+            cloneGlobals.chunkManager = newChunkManager;
+            const newEntities = [ new FloatingBlock(new vec4(6, 30, 6), "test", easyGl)];
+            cloneGlobals.entities = newEntities;
+            setPlayer(newPlayer);
+            setChunkManager(newChunkManager);
+            setEntities(newEntities);
+
+            for (let i=2; i<blocks.length; i++)
+            {
+                newPlayer.collectItem(blocks[i].type, 20);
+            }
+            return;
+        }
+
+
         if (canvasRef.current == null || easyGl == null || player == null || chunkManager == null || entities == null || zNearRef.current == null || zFarRef.current == null || fovRef.current == null) { return; }
 
         function spawnEntityByName(name, position = new vec4(), rotation = new vec4())
@@ -2325,19 +2202,19 @@ function Clone()
 
             
             //Update mining cube
-            if (blockMiningPos != null)
+            if (cloneGlobals.blockMiningPos != null)
             {
                 //easyGl.setObjectHide("selectOverlayCube", false);
-                const miningTimeElapsed = Date.now() - blockMiningStartTime;
-                const percentMiningCompleted = miningTimeElapsed/(blockMap.get(blockMiningType).mineTime*1000);
+                const miningTimeElapsed = Date.now() - cloneGlobals.blockMiningStartTime;
+                const percentMiningCompleted = miningTimeElapsed/(blockMap.get(cloneGlobals.blockMiningType).mineTime*1000);
                 let a = Math.max( 0.01, Math.min(percentMiningCompleted/5, 0.5)); //bound between 0.1 and 0.5, and scale so max time = 0.5
                 easyGl.setObjectColor("selectOverlayCube", new vec4(1,1,1,a));
-                easyGl.setObjectPosition("selectOverlayCube", blockMiningPos);
+                easyGl.setObjectPosition("selectOverlayCube", cloneGlobals.blockMiningPos);
                 easyGl.renderObject("selectOverlayCube");
                 if (percentMiningCompleted >= 1)
                 {
                     //remove block
-                    chunkManager.breakBlock(blockMiningPos);
+                    chunkManager.breakBlock(cloneGlobals.blockMiningPos);
                     eventListener( {type: "custommousemove"} );
                 }
             }
@@ -2368,27 +2245,49 @@ function Clone()
         let slowUpdate = setInterval(chunkManagerUpdate, 1000);
         
         function eventListener(event) {
+            if (event.type == "contextmenu") {
+                event.preventDefault();
+            }
+
+            // prevent default for spacebar
+            if (event.type == "keydown" && event.key == " ") {
+                event.preventDefault();
+            }
+
+            // neet to prevent default to prevent context menu from appearing
+            if (event.type == "mousedown" && event.button == 2) {
+                event.preventDefault();
+            }
             player.eventListener(event);
         }
-        canvasRef.current.addEventListener("mousedown", eventListener);
+
+        const canvasElement = canvasRef.current;
+        canvasElement.addEventListener("mousedown", eventListener);
         document.addEventListener("mouseup", eventListener);
-        canvasRef.current.addEventListener("mousemove", eventListener);
+        canvasElement.addEventListener("mousemove", eventListener);
+        canvasElement.addEventListener("contextmenu", eventListener);
         document.addEventListener("keydown", eventListener);
         document.addEventListener("keyup", eventListener);
-        zNearRef.current.addEventListener("input", sliderInput);
-        zFarRef.current.addEventListener("input", sliderInput);
-        fovRef.current.addEventListener("input", sliderInput);
+
+        const zNearInput = zNearRef.current;    
+        const zFarInput = zFarRef.current;
+        const fovInput = fovRef.current;
+
+        zNearInput.addEventListener("input", sliderInput);
+        zFarInput.addEventListener("input", sliderInput);
+        fovInput.addEventListener("input", sliderInput);
         return () => {
-            canvasRef.current.removeEventListener("mousedown", eventListener);
+            canvasElement.removeEventListener("mousedown", eventListener);
             document.removeEventListener("mouseup", eventListener);
-            canvasRef.current.removeEventListener("mousemove", eventListener);
+            canvasElement.removeEventListener("mousemove", eventListener);
             document.removeEventListener("keydown", eventListener);
             document.removeEventListener("keyup", eventListener);
+            canvasElement.removeEventListener("contextmenu", eventListener);
             clearInterval(renderInterval);
             clearInterval(slowUpdate);
-            zNearRef.current.removeEventListener("input", sliderInput);
-            zFarRef.current.removeEventListener("input", sliderInput);
-            fovRef.current.removeEventListener("input", sliderInput);
+            zNearInput.removeEventListener("input", sliderInput);
+            zFarInput.removeEventListener("input", sliderInput);
+            fovInput.removeEventListener("input", sliderInput);
         }
     }, [canvasRef, easyGl, player, chunkManager, entities]);
         
@@ -2396,30 +2295,24 @@ function Clone()
     // Setup & Resize
     useEffect(() => {
         const easyGl = new EasyGL(canvasRef.current, backgroundColor);
-        const player = new Player(new vec4(1,75,1), new vec4(0,0,0), easyGl);
-        const chunkManager = new ChunkManager(easyGl, chunkSize);
-        const entities = [ new FloatingBlock(new vec4(6, 30, 6), "test", easyGl)];
+        // const player = new Player(new vec4(1,75,1), new vec4(0,0,0), easyGl);
+        // const chunkManager = new ChunkManager(easyGl, chunkSize);
+        // const entities = [ new FloatingBlock(new vec4(6, 30, 6), "test", easyGl)];
 
         easyGl.setAmbientLightLevel(0.7);
         easyGl.setSortingTimeDelayMs(100);
         easyGl.resizeListener(); //resize canvas & gl
-        sliderInput(); //set FOV, zNear, and zFar to slider defaults
         easyGl.createObject("selectOverlayCube", new vec4(), new vec4(), new vec4(1.1,1.1,1.1,1.1), null, null, null, new vec4(1,1,1,0.2), true); //overlay cube for mining...
         easyGl.createObject("crosshair", new vec4(0,0,0), new vec4(0,0,0,0), new vec4(.03,.03,.03), [-1,0,0, 0,1,0, 1,0,0, 0,-1,0], [0,2,1,0,3,2], null, [1,0,0,0.7, 0,1,0,.7, 0,0,1,.7, 0,0,0,1], true);
 
         easyGl.createText("testTextX", "X+", new vec4(20,50,0), new vec4(0,Math.PI/2), new vec4(1,1,1), new vec4(1,1,1,1));
         easyGl.createText("testTextZ", "Z+", new vec4(0,50,20), new vec4(), new vec4(1,1,1), new vec4(1,1,1,1));
-
-        for (let i=2; i<blocks.length; i++)
-        {
-            player.collectItem(blocks[i].type, 20);
-        }
             
 
         setEasyGl(easyGl);
-        setPlayer(player);
-        setChunkManager(chunkManager);
-        setEntities(entities);
+        // setPlayer(player);
+        // setChunkManager(chunkManager);
+        // setEntities(entities);
 
         function resize() {
             const bb = canvasRef.current.getBoundingClientRect();
@@ -2467,54 +2360,54 @@ function Clone()
 
 //test();
 
-function test()
-{
+// function test()
+// {
     
-    const step = 10;
-    const size = 300;
-    const speed = 5;
-    let s = "";
-    let numIns = 0;
-    let px,py,pz=0;
-    /*for (let x=0; x<size; x+=step)
-    {
-        for (let z=0; z<size; z+=step)
-        {
-            const y = 200*Math.sin( Math.PI * 2 * x/size + z/size);
-            s += speed + " " + Math.round(x) + " " + Math.round(y) + " " + Math.round(z) + " ";
-            px = Math.round(x);
-            py = Math.round(y);
-            pz = Math.round(z);
-            numIns += 1;
-        }
-        s += 1 + " " + px + " " + (py-500) + " " + pz + " ";
-        s += 1 + " " + px + " " + (py-500) + " " + "0" + " ";
-    }
-    console.log(numIns);
-    console.log(s);*/
+//     const step = 10;
+//     const size = 300;
+//     const speed = 5;
+//     let s = "";
+//     let numIns = 0;
+//     let px,py,pz=0;
+//     /*for (let x=0; x<size; x+=step)
+//     {
+//         for (let z=0; z<size; z+=step)
+//         {
+//             const y = 200*Math.sin( Math.PI * 2 * x/size + z/size);
+//             s += speed + " " + Math.round(x) + " " + Math.round(y) + " " + Math.round(z) + " ";
+//             px = Math.round(x);
+//             py = Math.round(y);
+//             pz = Math.round(z);
+//             numIns += 1;
+//         }
+//         s += 1 + " " + px + " " + (py-500) + " " + pz + " ";
+//         s += 1 + " " + px + " " + (py-500) + " " + "0" + " ";
+//     }
+//     console.log(numIns);
+//     console.log(s);*/
 
-    easyGl.createText("myText", "Z", new vec4(), new vec4(), new vec4(1,1,1), new vec4(1,1,1,1));
-    const data = easyGl.getObjectData("myText");
-    const ind = data.indices;
-    const vert = data.vertices;
-    const scale = 500;
-    for (let i=0; i<ind.length; i+=3)
-    {
-        const v1 = new vec4(vert[ind[i  ]*3], vert[ind[i  ]*3+1]);
-        const v2 = new vec4(vert[ind[i+1]*3], vert[ind[i+1]*3+1]);
-        const v3 = new vec4(vert[ind[i+2]*3], vert[ind[i+2]*3+1]);
+//     easyGl.createText("myText", "Z", new vec4(), new vec4(), new vec4(1,1,1), new vec4(1,1,1,1));
+//     const data = easyGl.getObjectData("myText");
+//     const ind = data.indices;
+//     const vert = data.vertices;
+//     const scale = 500;
+//     for (let i=0; i<ind.length; i+=3)
+//     {
+//         const v1 = new vec4(vert[ind[i  ]*3], vert[ind[i  ]*3+1]);
+//         const v2 = new vec4(vert[ind[i+1]*3], vert[ind[i+1]*3+1]);
+//         const v3 = new vec4(vert[ind[i+2]*3], vert[ind[i+2]*3+1]);
 
-        console.log(v1, v2, v3);
+//         console.log(v1, v2, v3);
 
-        s += speed + " " + Math.round(v1.x*scale) + " " + 0 + " " + Math.round(v1.y*scale) + " "; //move to start
-        s += speed + " " + Math.round(v1.x*scale) + " " + 200 + " " + Math.round(v1.y*scale) + " ";
-        s += speed + " " + Math.round(v2.x*scale) + " " + 200 + " " + Math.round(v2.y*scale) + " ";
-        s += speed + " " + Math.round(v3.x*scale) + " " + 200 + " " + Math.round(v3.y*scale) + " ";
-        s += speed + " " + Math.round(v1.x*scale) + " " + 200 + " " + Math.round(v1.y*scale) + " ";
-        s += speed + " " + Math.round(v1.x*scale) + " " + 0 + " " + Math.round(v1.y*scale) + " "; //move up
-    }
-    console.log(s);
-}
+//         s += speed + " " + Math.round(v1.x*scale) + " " + 0 + " " + Math.round(v1.y*scale) + " "; //move to start
+//         s += speed + " " + Math.round(v1.x*scale) + " " + 200 + " " + Math.round(v1.y*scale) + " ";
+//         s += speed + " " + Math.round(v2.x*scale) + " " + 200 + " " + Math.round(v2.y*scale) + " ";
+//         s += speed + " " + Math.round(v3.x*scale) + " " + 200 + " " + Math.round(v3.y*scale) + " ";
+//         s += speed + " " + Math.round(v1.x*scale) + " " + 200 + " " + Math.round(v1.y*scale) + " ";
+//         s += speed + " " + Math.round(v1.x*scale) + " " + 0 + " " + Math.round(v1.y*scale) + " "; //move up
+//     }
+//     console.log(s);
+// }
 
 
 export default Clone;

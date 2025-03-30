@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { vec4 } from "../myMath";
 import { EasyGL, generateSphereMesh } from "./../easyGL";
 import { FPC } from "./fpc";
-// import Clone from "./clone";
+import Clone from "./clone";
 
 
 const c1Color = new vec4(.6,.3,.3,1);
@@ -374,23 +374,22 @@ function EasyGlMain() {
 
     
     return (
-        <div>
-            <div style={{display: 'flex', width: '100%', justifyContent: 'center'}}>
-                <h1>
-                    EasyGl
-                </h1>
+        <div className="project-page">
+            <div style={{'textAlign': 'center'}}>
+                <h1>EasyGL</h1>
+                <p>
+                    This is a library built in javascript wrapping webgl which makes rendering 3d objects and scenes quick and easy to do. 
+                    <br />
+                    Use predefined shapes or make your own (vertex & indice form), and easily move and arrange them and the camera in 3D space.
+                </p>
             </div>
+            
             <div style={{display: 'flex', width: '100%', justifyContent: 'center'}}>
-                <h2>
-                    A webgl-based library designed for rendering basic objects
-                </h2>
-            </div>
-            <div style={{display: 'flex', width: '100%', justifyContent: 'center'}}>
-                <h2>
+                <h5>
                     <a href={"https://github.com/19zgunther/EasyGL"}>
                         See https://github.com/19zgunther/EasyGL for details
                     </a>
-                </h2>
+                </h5>
             </div>
             
             <div style={{display: 'block', position: 'relative'}}>
@@ -415,8 +414,8 @@ function EasyGlMain() {
                     </p>
                 </div>
             </div>
-
-            {/* <Clone /> */}
+            
+            <Clone />
         </div>
     );
 }

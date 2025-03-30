@@ -1,116 +1,45 @@
-canvas {
-    margin:0;
-    padding:0;
-    height:0px;
-    left:0px;
-    top: 0px;
-    position:absolute;
-    background-color: rgba(0, 0, 0, 0);
-    display:block;
-    z-index: 0;
-}
-#Simulator {
-    position:relative;
-    max-width:100%;
-    max-height:80%;
-    margin:auto;
-    background-color: rgba(0, 0, 0, 1);
-}
-.sketch-container {
-    padding:0%;
-    background-color: rgba(29, 29, 29,0);
-    color:inherit;
+.canvas-container {
+    position: relative;
+    width: 90vw;  /* Takes 90% of viewport width */
+    height: 90vh; /* Takes 90% of viewport height */
+    margin: 0 auto;
 }
 
-.simulator-container {
-    padding-top: 4rem;
-    color: white;
-}
-
-.Box {
-    background-color: rgba(30, 30, 30, 0.7);
-    border: 1px solid var(--border-color);
+.charge-simulator-canvas-overlay {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 10; /* Ensure it's above all canvases */
+    background: rgba(0, 0, 0, 0.7);
     padding: 1rem;
-    margin: 1rem;
-}
-
-.Button {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    margin: 0.5rem;
-}
-
-.TextHeading {
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.Text {
-    margin: 0.5rem 0;
-}
-
-.InputText {
-    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
     border: 1px solid var(--border-color);
+}
+
+.charge-simulator-canvas-overlay button {
+    background: var(--accent-color);
     color: white;
-    padding: 0.25rem;
-    margin: 0.25rem;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.InputCheck {
-    margin-left: 1rem;
+.charge-simulator-canvas-overlay button:hover {
+    background: var(--accent-hover);
 }
 
-.InputSlider {
-    margin-left: 1rem;
-    width: 200px;
-}
+/* Optional: Different z-index for each canvas if you need specific stacking order */
+.grid-canvas { z-index: 1; }
+.arrow-canvas { z-index: 2; }
+.particle-canvas { z-index: 3; }
+.equipotential-canvas { z-index: 4; }
 
-.sketch-container {
+.charge-simulator-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    background: transparent;
+    height: 100%;
 }
-
-.Box:hover{
-    opacity: 1;
-}
-
-.InputSlider:hover{
-    opacity:1;
-}
-
-.InputText:hover{
-    opacity: 1;
-}
-
-.InputCheck:hover{
-    opacity:1;
-}
-
-.SensorText{
-    position:absolute;
-    margin:5px;
-    padding: 5px;
-    background-color: rgba(0,0,0,0.99);
-    text-align:center;
-    border:rgba(200,200,200,0.5);
-    border-color:rgba(200,200,200,0.5);
-    border-radius:5px;
-    border-width:1px;
-    border-style: solid;
-    opacity:0.7;
-    user-select: none;
-    font-size: x-small;
-    line-height: 0.9;
-}
-
-
-
-
-
-
-
-
-
-
