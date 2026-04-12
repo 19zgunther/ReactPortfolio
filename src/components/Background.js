@@ -51,8 +51,8 @@ function Background() {
     const numCrawlers = 10;
 
     const canvasRef = useRef(null);
+    const crawlersRef = useRef([]);
     const [points, setPoints] = useState(generatePoints(numPoints, { width: window.innerWidth, height: window.innerHeight }));
-    const [crawlers, setCrawlers] = useState([]);
     const [dimensions, setDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
     const [prevDimensions, setPrevDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
 
@@ -191,8 +191,9 @@ function Background() {
                         }
 
                         // Increase opacity if near crawler
-                        for (let i = 0; i < crawlers.length; i++) {
-                            const crawler = crawlers[i];
+                        const crawlersForOpacity = crawlersRef.current;
+                        for (let ci = 0; ci < crawlersForOpacity.length; ci++) {
+                            const crawler = crawlersForOpacity[ci];
                             const dx = point.x - crawler.lastX;
                             const dy = point.y - crawler.lastY;
                             const distance = Math.sqrt(dx * dx + dy * dy);
@@ -271,20 +272,26 @@ function Background() {
             }
 
             ////////////// UPDATE CRAWLERS //////////////
+            let crawlers = crawlersRef.current;
             if (crawlers.length < numCrawlers) {
-                const i = Math.floor(Math.random() * (points.length - 6)) + 3;
-                const j = Math.floor(Math.random() * (points[i].length - 6)) + 3;
-                setCrawlers([...crawlers, { x: j, y: i, nextX: j + 1, nextY: i + 1, percentDone: 1, lastX: j, lastY: i }]);
+                const rowIdx = Math.floor(Math.random() * (points.length - 6)) + 3;
+                const colIdx = Math.floor(Math.random() * (points[rowIdx].length - 6)) + 3;
+                crawlers.push({ x: colIdx, y: rowIdx, nextX: colIdx + 1, nextY: rowIdx + 1, percentDone: 1, lastX: colIdx, lastY: rowIdx });
             }
+            crawlers = crawlers.filter(
+                (c) =>
+                    c.x >= 0 &&
+                    c.x < colors[0].length &&
+                    c.y >= 0 &&
+                    c.y < colors.length &&
+                    c.nextX >= 0 &&
+                    c.nextX < colors[0].length &&
+                    c.nextY >= 0 &&
+                    c.nextY < colors.length
+            );
+            crawlersRef.current = crawlers;
             for (let i = 0; i < crawlers.length; i++) {
                 const crawler = crawlers[i];
-
-                // if crawler is out of bounds, remove it
-                if (crawler.x < 0 || crawler.x >= colors[0].length || crawler.y < 0 || crawler.y >= colors.length || crawler.nextX < 0 || crawler.nextX >= colors[0].length || crawler.nextY < 0 || crawler.nextY >= colors.length) {
-                    setCrawlers(crawlers.filter((_, index) => index !== i));
-                    continue;
-                }
-
 
                 const color1 = colors[crawler.y][crawler.x];
                 const color2 = colors[crawler.nextY][crawler.nextX];
@@ -339,7 +346,7 @@ function Background() {
         const intervalId = setInterval(render, 70);
 
         return () => clearInterval(intervalId);
-    }, [dimensions, points, crawlers]);
+    }, [dimensions, points]);
 
     useEffect(() => {
         const handleMouseMove = (event) => {
