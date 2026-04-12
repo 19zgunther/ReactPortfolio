@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './bash.css';
 
 const commandPrompt = "zgunther@my-laptop:~$ ";
-const origText = "Hi, I'm Zack Gunther\n\nI'm a Software Engineer working at Tesla.\n\nWelcome to my website where I showcase some of the projects I've worked on!\n\n\nplease press enter\n" + commandPrompt;
+const origText = "Hi, I'm Zack Gunther\n\nI'm a Software Engineer at Artifact, working on building AI-powered electrical design software.\n\nWelcome to my website where I showcase some of the projects I've worked on!\n\n\nplease press enter\n" + commandPrompt;
 
 function smile(args)
 {
