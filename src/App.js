@@ -118,18 +118,45 @@ function App() {
                   <h2>Experience</h2>
                   <div className="experience-grid">
                     <div className="experience-card">
-                      <h3>Full Stack Development</h3>
-                      <h4>Web & Application Development</h4>
+                      <h3>Analog Electronics</h3>
+                      <h4>Circuit & PCB Design</h4>
                       <div className="keyword-tags">
-                        <span className="keyword-tag">JavaScript</span>
-                        <span className="keyword-tag">Python</span>
-                        <span className="keyword-tag">Java</span>
-                        <span className="keyword-tag">HTML</span>
-                        <span className="keyword-tag">CSS</span>
-                        <span className="keyword-tag">ReactJS</span>
-                        <span className="keyword-tag">NextJS</span>
+                        <span className="keyword-tag">Altium</span>
+                        <span className="keyword-tag">KiCad</span>
+                        <span className="keyword-tag">OnShape</span>
+                        <span className="keyword-tag">PCB Milling</span>
                       </div>
-                      <p>Building scalable web applications using modern frameworks and technologies. Experience with React, Node.js, and cloud infrastructure.</p>
+                      <p>Designing and prototyping analog circuits from schematic through PCB fabrication.</p>
+                      <ul className="experience-bullets">
+                        <li>Schematic capture and PCB layout in Altium and KiCad</li>
+                        <li>Built a CNC milling pipeline for rapid at-home PCB prototyping</li>
+                      </ul>
+                    </div>
+
+                    <div className="experience-card experience-card-featured">
+                      <h3>Full Stack Engineering</h3>
+                      <h4>Web, Cloud & Application Development</h4>
+                      <div className="keyword-tags">
+                        <span className="keyword-tag">React</span>
+                        <span className="keyword-tag">Next.js</span>
+                        <span className="keyword-tag">TypeScript</span>
+                        <span className="keyword-tag">Node.js</span>
+                        <span className="keyword-tag">Python</span>
+                        <span className="keyword-tag">PostgreSQL</span>
+                        <span className="keyword-tag">Prisma</span>
+                        <span className="keyword-tag">MongoDB</span>
+                        <span className="keyword-tag">AWS</span>
+                        <span className="keyword-tag">Azure</span>
+                        <span className="keyword-tag">Terraform</span>
+                        <span className="keyword-tag">Vercel</span>
+                      </div>
+                      <p>Building scalable full-stack platforms across startups and industry — from browser-based CAD tools to test automation systems.</p>
+                      <ul className="experience-bullets">
+                        <li>Core product engineering for a browser-based electrical CAD app</li>
+                        <li>Built AI-assisted workflows, real-time collaboration, auth, and high-performance graph rendering</li>
+                        <li>Owned cloud deployment lifecycle (AWS, Azure, Terraform, Vercel) including on-prem platforms for SOC2 & FedRAMP</li>
+                        <li>Developed full-stack automation platforms that cut artifact collection time by over 95%</li>
+                      </ul>
                     </div>
 
                     <div className="experience-card">
@@ -141,18 +168,11 @@ function App() {
                         <span className="keyword-tag">Rust</span>
                         <span className="keyword-tag">CubeIDE</span>
                       </div>
-                      <p>Developing firmware and software for microcontrollers and embedded systems. Experience with real-time operating systems and low-level programming.</p>
-                    </div>
-
-                    <div className="experience-card">
-                      <h3>Analog Electronics</h3>
-                      <h4>Circuit & PCB Design</h4>
-                      <div className="keyword-tags">
-                        <span className="keyword-tag">Altium</span>
-                        <span className="keyword-tag">KiCad</span>
-                        <span className="keyword-tag">OnShape</span>
-                      </div>
-                      <p>Designing and implementing analog circuits. Experience with signal processing, PCB design, and electronic system integration.</p>
+                      <p>Firmware and large-scale simulation for embedded and vehicle systems.</p>
+                      <ul className="experience-bullets">
+                        <li>Developing firmware and software for microcontrollers and embedded systems.</li>
+                        <li>Experience with real-time operating systems and low-level programming.</li>
+                      </ul>
                     </div>
                   </div>
                 </section>

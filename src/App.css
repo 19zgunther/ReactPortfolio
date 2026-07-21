@@ -544,6 +544,7 @@ section {
 .experience-grid {
   display: flex;
   justify-content: center;
+  align-items: stretch;
   gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;
@@ -559,6 +560,28 @@ section {
   padding: 1.5rem;
   transition: transform 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.experience-card-featured {
+  flex: 2;
+  max-width: 1000px;
+}
+
+.experience-bullets {
+  margin: 0.75rem 0 0 0;
+  padding-left: 1.1rem;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.experience-bullets li {
+  margin-bottom: 0.45rem;
+}
+
+.experience-bullets li:last-child {
+  margin-bottom: 0;
 }
 
 /* Update hover effect for better contrast */
@@ -594,9 +617,11 @@ section {
     align-items: center;
   }
 
-  .experience-card {
+  .experience-card,
+  .experience-card-featured {
     width: 100%;
     max-width: 500px;
+    flex: 1;
   }
 }
 
