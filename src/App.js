@@ -179,6 +179,7 @@ function App() {
 
                 <section id="projects" className="projects-section">
                   <h2>Projects</h2>
+                  <i>Mostly Built Pre-AI</i>
                   <div className="project-grid-container">
                     <div className="project-grid">
                       {projects.map((project, index) => (
