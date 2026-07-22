@@ -69,8 +69,22 @@ function Background() {
             }
         };
 
+        const bb = { width: window.innerWidth, height: window.innerHeight };
+        const checkForWidthChange = () => {
+            if (bb.width !== window.innerWidth || bb.height !== window.innerHeight) {
+                bb.width = window.innerWidth;
+                bb.height = window.innerHeight;
+                setDimensions({ width: window.innerWidth, height: window.innerHeight });
+            }
+        }
+
+        const intervalId = setInterval(checkForWidthChange, 100);
+
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        return () => { 
+            window.removeEventListener('resize', handleResize);
+            clearInterval(intervalId);
+        }
     }, []);
 
     // Initialize points and start render loop

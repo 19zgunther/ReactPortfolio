@@ -24,8 +24,10 @@
 
 /* Navigation Bar */
 .navbar {
-  background-color: var(--bg-secondary);
-  padding: 0.5rem 2rem;
+  background-color: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0 1.75rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -34,49 +36,60 @@
   top: 0;
   left: 0;
   z-index: 1000;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   height: 3.5rem;
   box-sizing: border-box;
 }
 
 .nav-brand {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--accent-color);
-  content: 'zgunther';
-  transition: color 0.3s ease;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .nav-brand a {
   color: var(--accent-color);
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 .nav-brand a:hover,
 .nav-brand a:visited,
 .nav-brand a:active,
 .nav-brand a:focus {
-  color: var(--accent-hover);
+  color: var(--highlight-color);
   text-decoration: none;
 }
 
 .nav-links {
   display: flex;
   list-style: none;
-  gap: 2rem;
+  gap: 0.4rem;
   margin: 0;
   padding: 0;
+  align-items: center;
 }
 
-.nav-links a {
-  color: var(--text-primary);
+.nav-links a,
+.nav-links .dropdown-button {
+  color: var(--text-secondary);
   text-decoration: none;
-  transition: color 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
-.nav-links a:hover {
-  color: var(--accent-color);
+.nav-links a:hover,
+.nav-links .dropdown-button:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 /* Main Content Sections */
@@ -535,8 +548,8 @@ section {
 
 .experience-section h2 {
   color: var(--bg-primary);
-  margin-bottom: 2rem;
-  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
   font-size: 2.5rem;
   font-weight: 800;
 }

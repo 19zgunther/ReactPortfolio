@@ -155,7 +155,8 @@ function App() {
                         <li>Core product engineering for a browser-based electrical CAD app</li>
                         <li>Built AI-assisted workflows, real-time collaboration, auth, and high-performance graph rendering</li>
                         <li>Owned cloud deployment lifecycle (AWS, Azure, Terraform, Vercel) including on-prem platforms for SOC2 & FedRAMP</li>
-                        <li>Developed full-stack automation platforms that cut artifact collection time by over 95%</li>
+                        <li>Developed full-stack automation platforms and data visualization tools</li>
+                        <li>Built a social media platform for my friends to share photos, message, call, etc.</li>
                       </ul>
                     </div>
 

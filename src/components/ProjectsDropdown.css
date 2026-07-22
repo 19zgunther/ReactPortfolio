@@ -4,44 +4,42 @@
 }
 
 .dropdown-button {
-    background: none;
-    border: none;
-    color: var(--text-primary);
-    font-size: 1rem;
-    cursor: pointer;
-    padding: 0;
-    transition: color 0.3s ease;
-}
-
-.dropdown-button:hover {
-    color: var(--accent-color);
+    font-family: inherit;
+    line-height: inherit;
 }
 
 .dropdown-content {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 0.5rem);
     right: 0;
-    background-color: var(--bg-secondary);
-    min-width: 200px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-    border-radius: 4px;
-    border: 1px solid var(--border-color);
+    background-color: rgba(18, 18, 18, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    min-width: 210px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     z-index: 1001;
     opacity: 0;
-    transform: translateY(-10px);
-    animation: dropdownAppear 0.2s ease forwards;
+    transform: translateY(-6px);
+    animation: dropdownAppear 0.18s ease forwards;
+    overflow: hidden;
+    padding: 0.35rem;
 }
 
 .dropdown-content a {
-    color: var(--text-primary);
-    padding: 12px 16px;
+    color: var(--text-secondary);
+    padding: 0.55rem 0.75rem;
     text-decoration: none;
     display: block;
-    transition: all 0.2s ease;
+    border-radius: 5px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.15s ease, background 0.15s ease;
 }
 
 .dropdown-content a:hover {
-    background-color: var(--hover-bg);
+    background-color: rgba(240, 120, 56, 0.12);
     color: var(--accent-color);
 }
 
