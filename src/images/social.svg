@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0c10"/>
+      <stop offset="100%" stop-color="#1b1f27"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#bg)"/>
+  <rect x="230" y="36" width="180" height="328" rx="36" fill="#111318" stroke="#3a3f4a" stroke-width="4"/>
+  <rect x="242" y="50" width="156" height="300" rx="28" fill="#050608"/>
+  <rect x="292" y="58" width="56" height="12" rx="6" fill="#000"/>
+  <rect x="250" y="84" width="140" height="18" rx="9" fill="#1b1f27" stroke="#0a84ff" stroke-width="1.5"/>
+  <rect x="250" y="112" width="140" height="140" fill="#2d3440"/>
+  <circle cx="266" cy="126" r="8" fill="#8e9cb0"/>
+  <rect x="278" y="120" width="48" height="6" rx="2" fill="#f3f6fc"/>
+  <rect x="278" y="130" width="28" height="4" rx="2" fill="#8e9cb0"/>
+  <path d="M258 262 h16 v10 h-6 l-4 6z" fill="#0a84ff"/>
+  <text x="320" y="300" text-anchor="middle" fill="#8e9cb0" font-family="system-ui,sans-serif" font-size="14">Social</text>
+  <rect x="254" y="318" width="32" height="18" rx="4" fill="#0a84ff" opacity="0.9"/>
+  <rect x="294" y="318" width="32" height="18" rx="4" fill="#2d3440"/>
+  <rect x="334" y="318" width="32" height="18" rx="4" fill="#2d3440"/>
+</svg>

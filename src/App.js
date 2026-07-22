@@ -15,9 +15,11 @@ import MoonGenerator2 from './projects/planetGenerator/moonGenerator2';
 import CncRouter from './projects/cncRouter/cncRouter';
 import EasyGLMain from './projects/easyGL/main';
 import ChargeSimulator from './projects/chargeSimulator/chargeSimulator';
+import Social from './projects/social/social';
 // import OldProject from './projects/chargeSimulator/OldProject';
 
 // Import images
+import socialImg from './images/SocialWireframe.png';
 import chargeSimulatorImg from './images/chargedParticleSimulatorIMG.png';
 import snakeImg from './images/snake.png';
 import snake2Img from './images/snake2.png';
@@ -31,6 +33,12 @@ import easyGLImg from './images/easyGLDemoGif2.gif';
 
 function App() {
   const projects = [
+    {
+      name: "Social",
+      path: "social",
+      image: socialImg,
+      description: "Private photo feed and messaging app for friends — interactive mobile wireframe"
+    },
     {
       name: "Charge Simulator",
       path: "chargeSimulator",
@@ -209,6 +217,7 @@ function App() {
               </main>
             </>
           } />
+          <Route path="/social" element={<Social />} />
           <Route path="/chargeSimulator" element={<ChargeSimulator />} />
           <Route path="/resume" element={<Resume />} />
           <Route path="/snake" element={<Snake />} />

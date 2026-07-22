@@ -33,7 +33,11 @@ function ChargeSimulator() {
     const [showForceInfo, setShowForceInfo] = useState(true);
 
     const [gridSizePx, setGridSizePx] = useState(20);
-    const [particles, setParticles] = useState([new Particle(0.000000001, new vec4(10, 10)), new Particle(-0.000000001, new vec4(20, 20)), new Particle(0.000000002, new vec4(30, 30))]);
+    const [particles, setParticles] = useState([
+        new Particle(0.000000001, new vec4(22, 14)),
+        new Particle(-0.000000001, new vec4(26, 18)),
+        new Particle(0.000000002, new vec4(24, 10)),
+    ]);
     const [equipotentialLinesString, setEquipotentialLinesString] = useState('-1,0,1');
 
     const [rerenderIndex, setRerenderIndex] = useState(0);
@@ -46,6 +50,7 @@ function ChargeSimulator() {
         mouseDownPos: new vec4(0, 0),
         mouseWasDown: false,
         draggingSelectedParticle: false,
+        draggedParticle: null,
         escapePressed: false,
         deletePressed: false,
         chargeInputFocused: false,
@@ -315,6 +320,8 @@ function ChargeSimulator() {
             ctx.beginPath();
             ctx.strokeStyle = settings.gridMinorColor;
             ctx.clearRect(0, 0, widthPx, heightPx);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, widthPx, heightPx);
             for (let x=0; x<heightPx; x+=gridSizePx) {
                 ctx.moveTo(0, x);
                 ctx.lineTo(widthPx, x);
@@ -434,19 +441,43 @@ function ChargeSimulator() {
             ctx.closePath();
         }
 
+        const hitRadiusGrid = settings.chargeRadius / gridSizePx;
+
+        function findNearestParticle(pos, maxDist = hitRadiusGrid) {
+            let nearest = null;
+            let nearestDist = maxDist;
+            for (const particle of particles) {
+                const dist = particle.pos.distTo(pos);
+                if (dist < nearestDist) {
+                    nearest = particle;
+                    nearestDist = dist;
+                }
+            }
+            return nearest;
+        }
+
+        function syncMousePos(event) {
+            if (!gridCanvasBoundingClientRect) { return; }
+            globals.mousePosPx = new vec4(
+                event.clientX - gridCanvasBoundingClientRect.left,
+                event.clientY - gridCanvasBoundingClientRect.top
+            );
+            globals.mousePos = globals.mousePosPx.mul(1 / gridSizePx);
+        }
+
         function eventHandler(event) {
             switch(event.type) {
                 case 'mousedown':
                     globals.mouseDown = true;
-                    globals.mousePosPx = new vec4(event.clientX - gridCanvasBoundingClientRect.left, event.clientY - gridCanvasBoundingClientRect.top);
-                    globals.mousePos = globals.mousePosPx.mul(1/gridSizePx);
+                    syncMousePos(event);
                     break;
                 case 'mouseup':
                     globals.mouseDown = false;
+                    globals.draggingSelectedParticle = false;
+                    globals.draggedParticle = null;
                     break;
                 case 'mousemove':
-                    globals.mousePosPx = new vec4(event.clientX - gridCanvasBoundingClientRect.left, event.clientY - gridCanvasBoundingClientRect.top);
-                    globals.mousePos = globals.mousePosPx.mul(1/gridSizePx);
+                    syncMousePos(event);
                     break;
                 case 'keydown':
                     if (event.key === 'Escape') {
@@ -456,58 +487,60 @@ function ChargeSimulator() {
                     }
                     break;
                 default:
-                    console.log(event);
                     break;
             }
         }
 
         function update() {
-
-            if (selectedParticle && !createNewParticle) {
-                if (globals.deletePressed && !globals.chargeInputFocused) {
-                    // Delete the selected particle
-                    setParticles(particles.filter(particle => particle !== selectedParticle));
-                    setSelectedParticle(null);
-                    globals.draggingSelectedParticle = false;
-                }
-                if (!globals.mouseDown) {
-                    // Stop dragging
-                    globals.draggingSelectedParticle = false;
-                }
-                if (globals.mouseDown && !globals.mouseWasDown) {
-                    // Start dragging or deselect
-                    if (selectedParticle.pos.distTo(globals.mousePos) < 10) {
-                        globals.draggingSelectedParticle = true;
-                    } else {
-                        setSelectedParticle(null);
-                        globals.draggingSelectedParticle = false;
-                    }
-                }
-                if (globals.escapePressed) {
-                    // Deselect
-                    console.log("Deselecting particle", selectedParticle);
-                    setSelectedParticle(null);
-                    globals.draggingSelectedParticle = false;
-                }
-                if (selectedParticle && globals.draggingSelectedParticle) {
-                    // Dragging ( Update position )
-                    selectedParticle.pos = globals.mousePos.copy().round();
-                }
-            } else if (createNewParticle) {
-                // Create a new particle
-                console.log("Creating new particle");
-                const newParticle = new Particle(0.000000001, new vec4(width/2, height/2));
+            if (createNewParticle) {
+                const newParticle = new Particle(0.000000001, new vec4(width / 2, height / 2));
                 setParticles([...particles, newParticle]);
+                setSelectedParticle(newParticle);
                 setCreateNewParticle(false);
-            } else {
-                // No selected particle
-                if (globals.mouseDown && !globals.mouseWasDown) {
-                    // Select a new particle
-                    const newSelectedParticle = particles.find(particle => particle.pos.distTo(globals.mousePos) < settings.chargeRadius);
-                    console.log("newSelectedParticle", newSelectedParticle);
-                    setSelectedParticle(newSelectedParticle);
+                globals.draggingSelectedParticle = false;
+                globals.draggedParticle = null;
+                globals.mouseWasDown = globals.mouseDown;
+                globals.escapePressed = false;
+                globals.deletePressed = false;
+                return;
+            }
+
+            if (globals.deletePressed && selectedParticle && !globals.chargeInputFocused) {
+                setParticles(particles.filter(particle => particle !== selectedParticle));
+                setSelectedParticle(null);
+                globals.draggingSelectedParticle = false;
+                globals.draggedParticle = null;
+            }
+
+            if (globals.escapePressed) {
+                setSelectedParticle(null);
+                globals.draggingSelectedParticle = false;
+                globals.draggedParticle = null;
+            }
+
+            if (!globals.mouseDown) {
+                globals.draggingSelectedParticle = false;
+                globals.draggedParticle = null;
+            }
+
+            // Fresh press: select nearest particle under cursor, or deselect.
+            // Keep the drag target on globals so stale React closures can't
+            // keep moving a previously selected particle.
+            if (globals.mouseDown && !globals.mouseWasDown) {
+                const hit = findNearestParticle(globals.mousePos);
+                if (hit) {
+                    setSelectedParticle(hit);
                     globals.draggingSelectedParticle = true;
+                    globals.draggedParticle = hit;
+                } else {
+                    setSelectedParticle(null);
+                    globals.draggingSelectedParticle = false;
+                    globals.draggedParticle = null;
                 }
+            }
+
+            if (globals.draggingSelectedParticle && globals.draggedParticle && globals.mouseDown) {
+                globals.draggedParticle.pos = globals.mousePos.copy().round();
             }
 
             globals.mouseWasDown = globals.mouseDown;
@@ -516,20 +549,21 @@ function ChargeSimulator() {
         }
 
         const equipotentialCanvas = equipotentialCanvasRef.current;
+        // mousedown stays on the canvas; mouseup/move on window so drag state
+        // doesn't stick when the cursor is released outside the canvas
         equipotentialCanvas.addEventListener('mousedown', eventHandler);
-        equipotentialCanvas.addEventListener('mouseup', eventHandler);
-        equipotentialCanvas.addEventListener('mousemove', eventHandler);
+        window.addEventListener('mouseup', eventHandler);
+        window.addEventListener('mousemove', eventHandler);
         window.addEventListener('keydown', eventHandler);
         const updateInterval = setInterval(update, 20);
         const renderGridInterval = setInterval(renderGrid, 100);
         const renderParticlesInterval = setInterval(renderParticles, 30);
         const equipotentialUpdateInterval = setInterval(renderEquipotentials, 300);
-        console.log("Rerendering")
 
         return () => {
             equipotentialCanvas.removeEventListener('mousedown', eventHandler);
-            equipotentialCanvas.removeEventListener('mouseup', eventHandler);
-            equipotentialCanvas.removeEventListener('mousemove', eventHandler);
+            window.removeEventListener('mouseup', eventHandler);
+            window.removeEventListener('mousemove', eventHandler);
             window.removeEventListener('keydown', eventHandler);
             clearInterval(updateInterval);
             clearInterval(equipotentialUpdateInterval);
@@ -597,23 +631,49 @@ function ChargeSimulator() {
                 <canvas ref={equipotentialCanvasRef} className="equipotential-canvas charge-simulator-canvas"></canvas>
 
                 <div className="charge-simulator-canvas-overlay">
-                    <button onClick={() => setCreateNewParticle(true)}>Create New Particle</button>
-                    <br />
-                    Show Force Info: <input type="checkbox" checked={showForceInfo} onChange={() => setShowForceInfo(!showForceInfo)} />
-                    <br />
-                    Equipotential Lines: <input type="text" value={equipotentialLinesString} onChange={(e) => {setEquipotentialLinesString(e.target.value)}} />
-
-
-                    {selectedParticle && (
-                        <div style={{paddingTop: '1rem'}}>
-                            Selected Particle Settings:
-                            <br />
-                            <button onClick={() => globals.deletePressed = true}>Delete</button>
-                            <br />
-                            Charge: <input type="number" step={0.01} onFocus={()=>{globals.chargeInputFocused = true}} onBlur={()=>{globals.chargeInputFocused = false}} value={selectedParticle.charge*1000000000} onChange={(e) => {selectedParticle.charge = parseFloat(e.target.value)/1000000000; setRerenderIndex(rerenderIndex+1)}} /> nC
+                    <div className="charge-simulator-overlay-section">
+                        <p className="charge-simulator-overlay-title">Controls</p>
+                        <button onClick={() => setCreateNewParticle(true)}>
+                            Create New Particle
+                        </button>
+                        <div className="charge-simulator-overlay-row">
+                            <span className="charge-simulator-overlay-label">Show force info</span>
+                            <input type="checkbox" checked={showForceInfo} onChange={() => setShowForceInfo(!showForceInfo)} />
                         </div>
+                        <label className="charge-simulator-overlay-label" htmlFor="equipotential-lines">Equipotential lines</label>
+                        <input
+                            id="equipotential-lines"
+                            type="text"
+                            value={equipotentialLinesString}
+                            onChange={(e) => {setEquipotentialLinesString(e.target.value)}}
+                            placeholder="-1, 0, 1"
+                        />
+                    </div>
+
+                    <div className="charge-simulator-overlay-divider" />
+
+                    {selectedParticle ? (
+                        <div className="charge-simulator-overlay-section">
+                            <p className="charge-simulator-overlay-title">Selected particle</p>
+                            <div className="charge-simulator-overlay-row">
+                                <span className="charge-simulator-overlay-label">Charge</span>
+                                <div className="charge-simulator-charge-field">
+                                    <input
+                                        type="number"
+                                        step={0.01}
+                                        onFocus={()=>{globals.chargeInputFocused = true}}
+                                        onBlur={()=>{globals.chargeInputFocused = false}}
+                                        value={selectedParticle.charge*1000000000}
+                                        onChange={(e) => {selectedParticle.charge = parseFloat(e.target.value)/1000000000; setRerenderIndex(rerenderIndex+1)}}
+                                    />
+                                    <span className="charge-simulator-unit">nC</span>
+                                </div>
+                            </div>
+                            <button className="danger" onClick={() => globals.deletePressed = true}>Delete Particle</button>
+                        </div>
+                    ) : (
+                        <p className="charge-simulator-selected-hint">Click a particle to edit</p>
                     )}
-                    
                 </div>
             </div>
         </div>
