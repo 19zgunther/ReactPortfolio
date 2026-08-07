@@ -658,8 +658,8 @@ function Social() {
           This is an app I built for my friends and myself. It allows users to post photos to all or
           any subset of their friends, comment and react with custom emojis, share photos, plan
           events, create polls, call groups, etc. Since I built it in January 2026, we&apos;ve been
-          using it consistently since. For many of my friends it&apos;s the only social media app
-          they still have.
+          using it consistently, and for many of my friends it&apos;s the only social media app
+          they have.
         </p>
         <br />
         <p>
